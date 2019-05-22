@@ -1,21 +1,16 @@
 <template lang="pug">
-  #app
+  v-app
     v-toolbar
       v-toolbar-side-icon
-      v-toolbar-title Title
+      v-toolbar-title rettiwt
       v-spacer
-      v-btn(icon)
-        v-icon search
-      v-btn(icon)
-        v-icon apps
-      v-btn(icon)
-        v-icon refresh
-      v-btn(icon)
-        v-icon more_vert
-    #nav
-      router-link(to="/") Home
-      | |
-      router-link(to="/about") About
+      v-btn(icon to="/home")
+        v-icon home
+      // router-link(to="/search")
+      //   v-btn(icon)
+      //     v-icon search
+      v-btn(icon to="/login")
+        v-icon face
     router-view
 </template>
 
