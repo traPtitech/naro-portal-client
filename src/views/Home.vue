@@ -20,6 +20,10 @@ export default {
 </script>
 
 <style>
+.body {
+  text-align: center;
+}
+
 .compose-tweet {
   height: 100px;
   width: 75%;
