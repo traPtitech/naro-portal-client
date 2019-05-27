@@ -25,6 +25,10 @@ const router = new Router({
 });
 
 router.beforeEach(async (to, from, next) => {
+  if (to.path === "/login") {
+    return next();
+  }
+
   try {
     await fetch("/api/whoami");
 
