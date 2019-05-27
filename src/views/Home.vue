@@ -1,17 +1,19 @@
 <template lang="pug">
-  .top
+  .home
     h1 This is Home Page
-    HelloWorld
+    p {{ posts }}
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+import { PostsApi, Post } from "../api";
 
-@Component({
-  components: {
-    HelloWorld
+export default class Home extends Vue {
+  api: PostsApi | null = null;
+  posts: Post[] = [];
+  async created() {
+    this.api = new PostsApi();
+    console.log(await this.api.getPosts());
   }
-})
-export default class Home extends Vue {}
+}
 </script>
