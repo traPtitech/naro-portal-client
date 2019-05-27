@@ -11,7 +11,9 @@ const execAsync = promisify(exec);
 (async () => {
   const res = await request(URL);
 
-  await fs.mkdir("./scripts/bin/");
+  try {
+    await fs.mkdir("./scripts/bin/");
+  } catch {}
   await fs.writeFile("./scripts/bin/swagger.yaml", res, "utf-8");
 
   const { stdout, stderr } = await execAsync(
