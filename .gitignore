@@ -19,3 +19,9 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+/scripts/bin/
+/src/api/.openapi-generator
+/src/api/.gitignore
+/src/api/.openapi-generator-ignore
+/src/api/git_push.sh
