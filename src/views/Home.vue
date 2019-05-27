@@ -8,6 +8,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { PostsApi, Post } from "../api";
 
+@Component({})
 export default class Home extends Vue {
   api: PostsApi | null = null;
   posts: Post[] = [];

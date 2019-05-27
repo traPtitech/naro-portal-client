@@ -38,7 +38,7 @@ const router = new Router({
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.path === "/login") {
+  if (["/login", "/register"].includes(to.path)) {
     return next();
   }
 

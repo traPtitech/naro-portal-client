@@ -7,6 +7,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { UsersApi } from "../api";
 
+@Component({})
 export default class User extends Vue {
   api: UsersApi | null = null;
   created() {
