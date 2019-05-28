@@ -11,7 +11,9 @@
       //     v-icon search
       v-btn(icon to="/login")
         v-icon face
-    router-view
+    v-content
+      v-container(fluid fill-height)
+        router-view
 </template>
 
 <style lang="stylus">

@@ -8,7 +8,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { AuthsApi } from "../api";
 
-@Component({})
+@Component
 export default class Login extends Vue {
   api: AuthsApi | null = null;
   async created() {
