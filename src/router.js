@@ -8,6 +8,7 @@ import Review from "./views/review.vue";
 import Show from "./views/show.vue";
 import Myreviews from "./views/myreviews.vue";
 import Myfav from "./views/myfav.vue";
+import TimeLine from "./views/follow.vue";
 import Title from "./views/title.vue";
 import User from "./views/user.vue";
 Vue.use(Router);
@@ -75,6 +76,14 @@ const router = new Router({
       path: "/myfav",
       name: "myfav",
       component: Myfav,
+      meta: {
+        isPublic: true
+      }
+    },
+    {
+      path: "/mytimeline",
+      name: "mytimeline",
+      component: TimeLine,
       meta: {
         isPublic: true
       }

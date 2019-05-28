@@ -1,5 +1,11 @@
 <template>
   <div>
+    <div>
+        {{ this.$route.params.userName }}
+        <button @click="follow()">follow</button>
+    </div>
+    <br>
+    <br>
     <div v-if="reviews">
       <div v-for="review in reviews" :key="review.name">
           <div>
@@ -41,8 +47,14 @@ export default {
   methods: {
     fav(reviewid) {
       axios.post("/api/givefav", {
-        Id: reviewid
+        id: reviewid
       });
+    },
+    follow() {
+        const userName = this.$route.params.userName;
+        axios.post("/api/follow", {
+        username: userName
+        })
     }
   }
 };

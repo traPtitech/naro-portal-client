@@ -1,11 +1,13 @@
 <template>
   <div>
-      <div>
-          <router-link :to="'/mytimeline'">タイムライン</router-link> |
-          <router-link :to="'/myfav'">お気に入りした投稿</router-link>
-      </div>
     <div v-if="reviews">
       <div v-for="review in reviews" :key="review.name">
+          <div>
+              投稿者:
+              <router-link :to="'/users/' + review.username">
+                {{ review.username }}
+              </router-link>
+          </div>
           <div>
               タイトル:
               <router-link :to="'/titles/' + review.title">
@@ -14,9 +16,6 @@
           </div>
           <div>
               感想:{{ review.contents }}
-          </div>
-          <div>
-              Fav数:{{ review.favcount }}
           </div>
           <button @click="fav(review.id)">fav</button>
           <br>
@@ -30,14 +29,14 @@
 <script>
 import axios from "axios";
 export default {
-  name: "myreviews",
+  name: "Follow",
   data() {
     return {
       reviews: null
     };
   },
   mounted() {
-    axios.get('/api/myreviews').then(res => {
+    axios.get('/api/mytimeline').then(res => {
       this.reviews = res.data;
     }); 
   },

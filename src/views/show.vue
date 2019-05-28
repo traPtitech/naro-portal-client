@@ -47,7 +47,7 @@ export default {
   methods: {
     fav(reviewid) {
       axios.post("/api/givefav", {
-        Id: reviewid
+        id: reviewid
       });
     }
   }
