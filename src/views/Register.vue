@@ -11,7 +11,7 @@
           v-alert(:value="status === 'success'" type="success" transition="scale-transition")
             |登録が完了しました
             |ページ遷移します
-          v-alert(:value="status === 'error'" type="error" dismissible transition="scale-transition") 登録に失敗しました
+          v-alert(:value="status === 'error'" type="error" dismissible transition="scale-transition") {{ errorMessage }}
         v-card-actions
           v-btn(:loading="status === 'loading'" :disabled="submitDisabled" color="success" @click="submit") 登録
           v-btn(color="error" @click="reset") リセット
@@ -50,6 +50,7 @@ export default class Register extends Vue {
       `パスワードは${this.PASSWORD_MAX_LENGTH}文字以内です`
   ];
   status: "none" | "loading" | "success" | "error" = "none";
+  errorMessage = "";
 
   get submitDisabled(): boolean {
     return !this.valid || ["loading", "success"].includes(this.status);
@@ -71,7 +72,14 @@ export default class Register extends Vue {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         this.$router.push("/home");
-      } catch {
+      } catch (e) {
+        if (e.message.includes("status code 400")) {
+          this.errorMessage = "不正なIDまたはパスワードが入力されました";
+        } else if (e.message.includes("status code 409")) {
+          this.errorMessage = "そのIDは使用できません";
+        } else {
+          this.errorMessage = "登録に失敗しました";
+        }
         this.status = "error";
       }
     } else {
