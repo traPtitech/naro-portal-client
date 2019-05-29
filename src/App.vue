@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div class="header">
-      <div class="header-left" @click="pushTo('/')">Home</div>
-      <div class="header-left" @click="pushTo('/about')">About</div>
+      <router-link tag="div" class="header-left" to="/">Home</router-link>
+      <router-link tag="div" class="header-left" to="/about">About</router-link>
     </div>
     <div class="body">
       <router-view />
@@ -12,12 +12,7 @@
 
 <script>
 export default {
-  name: "App",
-  methods: {
-    pushTo(url) {
-      this.$router.push(url);
-    }
-  }
+  name: "App"
 };
 </script>
 
