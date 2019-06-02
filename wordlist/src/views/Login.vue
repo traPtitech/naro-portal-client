@@ -1,19 +1,33 @@
 <template>
-  <div>
+  <div class="login">
     <h1>Login</h1>
-    <input type="text" v-model="userName">
-    <input type="text" v-model="password">
-    <button @click="login">ログイン</button> 
+    <span>ユーザー名：</span>
+    <input type="text" v-model="userName" />
+    <br />
+    <span>パスワード：</span>
+    <input type="text" v-model="password" />
+    <br />
+    <button @click="login">ログイン</button>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "login",
+  data() {
+    return {
+      userName: "",
+      password: ""
+    };
+  },
   methods: {
-     login (){
-         
-     }
+    login() {
+      axios.post("/api/login", {
+        username: this.userName,
+        password: this.password
+      });
+    }
   }
 };
 </script>
