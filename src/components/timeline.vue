@@ -1,12 +1,12 @@
 <template>
   <div id="timeline">
-    <h1>{{ userName }}</h1>
-    <div v-for="(tweet, index) in tweets" :key="index" class="tweet">
+    <h1>{{ this.userName }}</h1>
+    <div v-for="tweet in tweets" :key="tweet.tweetID" class="tweet">
       <div class="time">{{ tweet.createdAt }}</div>
       <button v-bind:disabled="isPush" @click="postFavo(tweet.tweetID)">
         favo
       </button>
-      <div class="favoNum">{{ tweet.favoNum - 1 }}</div>
+      <div class="favoNum">{{ tweet.favoNum || 0 }}</div>
       <div class="tweet">{{ tweet.tweet }}</div>
     </div>
     <div>
@@ -19,6 +19,7 @@
 
 <script>
 import axios from 'axios'
+import { setInterval, clearInterval } from 'timers'
 export default {
   name: 'Timeline',
   data() {
@@ -28,6 +29,7 @@ export default {
       text: '',
       message: '',
       isPush: false,
+      upDateTweetTimer: null,
     }
   },
   methods: {
@@ -36,47 +38,60 @@ export default {
       if (this.text === '') {
         this.message = '空のTweetはできません'
       } else {
-        axios.post('/api/tweet', {
-          tweet: this.text,
-        })
-        axios.get('/api/timeline/' + this.userName).then(res => {
-          this.tweets = res.data
+        axios.post('/api/tweet', { tweet: this.text }).then(() => {
+          axios.get('/api/timeline/' + this.userName).then(res => {
+            this.tweets = res.data
+          })
         })
       }
+      this.text = ''
       this.isPush = false
     },
     postFavo(tweetID) {
       this.isPush = true
-      axios
-        .post('/api/isFavo', {
-          tweetID: tweetID,
-        })
-        .then(res => {
-          if (res.data !== 'none') {
-            axios
-              .post('/api/favoDelete', {
+      axios.get('/api/isFavo/' + tweetID).then(res => {
+        if (res.data !== 'none') {
+          axios
+            .delete('/api/favo', {
+              data: {
                 tweetID: tweetID,
+              },
+            })
+            .then(() => {
+              axios.get('/api/timeline/' + this.userName).then(res => {
+                this.tweets = res.data
+                this.isPush = false
               })
-              .then(
-                axios.get('/api/timeline/' + this.userName).then(res => {
-                  this.tweets = res.data
-                  this.isPush = false
-                })
-              )
-          } else {
-            axios
-              .post('/api/favoAdd', {
-                tweetID: tweetID,
+            })
+        } else {
+          axios
+            .post('/api/favo', {
+              tweetID: tweetID,
+            })
+            .then(() => {
+              axios.get('/api/timeline/' + this.userName).then(res => {
+                this.tweets = res.data
+                this.isPush = false
               })
-              .then(
-                axios.get('/api/timeline/' + this.userName).then(res => {
-                  this.tweets = res.data
-                  this.isPush = false
-                })
-              )
-          }
-        })
+            })
+        }
+      })
     },
+    reloadTweet() {
+      axios.get('/api/reloadTimeline/' + this.userName).then(res => {
+        if (res === 'new message exist') {
+          axios.get('/api/timeline/' + this.userName).then(res => {
+            this.tweets = res.data
+          })
+        }
+      })
+    },
+  },
+  mounted() {
+    this.upDateTweetTimer = setInterval(this.reloadTweet, 5000)
+  },
+  destroyed() {
+    clearInterval(this.upDateTweetTimer)
   },
   beforeCreate() {
     axios.get('/api/whoAmI').then(res => {
