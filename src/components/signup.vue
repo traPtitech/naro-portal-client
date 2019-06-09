@@ -3,7 +3,7 @@
     <v-flex sm8 xs12>
       <v-layout wrap column justify-center>
         <v-flex class="light-blue lighten-1"
-          ><v-layout justify-center><h1>ログイン</h1></v-layout></v-flex
+          ><v-layout justify-center><h1>サインアップ</h1></v-layout></v-flex
         >
 
         <v-text-field
@@ -21,23 +21,21 @@
           :rules="passwordRules"
           v-model="password"
         />
-
         <v-layout row wrap justify-center>
           <v-btn
             round
             v-bind:disabled="isPush"
-            @click="postLogin"
+            @click="postSignup"
             class="light-blue lighten-1"
-            ><span>ログイン</span></v-btn
+            ><span>サインアップ</span></v-btn
           >
           <v-btn
             round
             v-bind:disabled="isPush"
-            @click="changeToSignup"
+            @click="changeToLogin"
             class="light-blue lighten-1"
+            ><span>ログイン画面へ</span></v-btn
           >
-            <span>アカウントを新しく作る</span>
-          </v-btn>
         </v-layout>
       </v-layout>
     </v-flex>
@@ -46,7 +44,7 @@
 <script>
 import axios from 'axios'
 export default {
-  name: 'Login',
+  name: 'Signup',
   data() {
     return {
       name: null,
@@ -65,24 +63,31 @@ export default {
     }
   },
   methods: {
-    postLogin() {
+    postSignup() {
       this.isPush = true
       axios
-        .post('/api/login', {
+        .post('/api/signup', {
           userName: this.name,
           userPassword: this.password,
         })
         .then(res => {
-          if (res.data === 'OK') {
-            this.$router.push('/')
+          this.$router.push('/')
+          this.isPush = false
+        })
+        .catch(err => {
+          if (err.response.status === 400) {
+            this.message = err.response.data.message
           } else {
-            this.message = '名前またはパスワードが間違っています'
+            console.error({
+              statusCode: err.response.status,
+              message: err.response.data.message,
+            })
           }
           this.isPush = false
         })
     },
-    changeToSignup() {
-      this.$router.push('/signup')
+    changeToLogin() {
+      this.$router.push('/login')
     },
   },
 }

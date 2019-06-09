@@ -1,20 +1,38 @@
 <template>
-  <div id="timeline">
-    <h1>{{ this.userName }}</h1>
-    <div v-for="tweet in tweets" :key="tweet.tweetID" class="tweet">
-      <div class="time">{{ tweet.createdAt }}</div>
-      <button v-bind:disabled="isPush" @click="postFavo(tweet.tweetID)">
-        favo
-      </button>
-      <div class="favoNum">{{ tweet.favoNum || 0 }}</div>
-      <div class="tweet">{{ tweet.tweet }}</div>
-    </div>
-    <div>
-      <input type="text" v-model="text" />
-      <button v-bind:disabled="isPush" @click="postTweet">送信</button>
-      <div id="message">{{ message }}</div>
-    </div>
-  </div>
+  <v-layout justify-center>
+    <v-flex sm8 xs12>
+      <v-layout wrap column justify-center>
+        <v-layout row wrap class="light-blue lighten-1" justify-center
+          ><h1>{{ this.userName }}</h1>
+          <v-btn v-bind:disabled="isPush" round @click="logout" class="white"
+            ><span id="bottun">ログアウト</span></v-btn
+          ></v-layout
+        >
+
+        <v-card v-for="tweet in tweets" :key="tweet.tweetID" class="tweet">
+          <v-card-text
+            ><v-layout wrap row justify-center aline-center
+              >{{ tweet.createdAt }}
+              <v-btn
+                flat
+                icon
+                color="pink"
+                v-bind:disabled="isPush"
+                @click="postFavo(tweet.tweetID)"
+              >
+                <v-icon>favorite</v-icon>
+              </v-btn>
+              {{ tweet.favoNum || 0 }}</v-layout
+            ></v-card-text
+          >
+          <v-card-text>{{ tweet.tweet }}</v-card-text>
+        </v-card>
+
+        <v-textarea v-model="text" />
+        <button v-bind:disabled="isPush" @click="postTweet">送信</button>
+      </v-layout>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -84,6 +102,11 @@ export default {
             this.tweets = res.data
           })
         }
+      })
+    },
+    logout() {
+      axios.post('/api/logout').then(() => {
+        this.$router.push('/login')
       })
     },
   },

@@ -1,16 +1,25 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <v-app>
+    <v-toolbar class="light-blue lighten-1">
+      <v-layout justify-center>
+        <v-toolbar-title class="headline">
+          <span>TwitterClone</span>
+        </v-toolbar-title>
+      </v-layout>
+    </v-toolbar>
+
+    <v-container>
+      <router-view />
+    </v-container>
+  </v-app>
 </template>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+span,
+h1 {
+  color: white;
+}
+#bottun {
+  color: #4fc3f7;
 }
 </style>
