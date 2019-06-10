@@ -1,6 +1,6 @@
 <template>
   <v-layout justify-center>
-    <v-flex sm8 xs12>
+    <v-flex sm6 xs12>
       <v-layout wrap column justify-center>
         <v-flex sm4 xs5>
           <v-layout wrap row justify-center class="light-blue lighten-1">
