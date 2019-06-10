@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Login from './components/login'
 import Signup from './components/signup'
 import Timeline from './components/timeline'
+import FavoList from './components/favolist'
 
 Vue.use(Router)
 
@@ -29,6 +30,11 @@ const router = new Router({
       meta: {
         isPublic: true,
       },
+    },
+    {
+      path: '/favoList',
+      name: 'favoList',
+      component: FavoList,
     },
   ],
 })

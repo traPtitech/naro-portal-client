@@ -12,6 +12,14 @@
             outline
             v-bind:disabled="isPush"
             round
+            @click="changeToFavoList"
+            class="white white--text"
+            >MyFavoList</v-btn
+          >
+          <v-btn
+            outline
+            v-bind:disabled="isPush"
+            round
             @click="logout"
             class="white white--text"
             >ログアウト</v-btn
@@ -223,6 +231,9 @@ export default {
             })
         }
       })
+    },
+    changeToFavoList() {
+      this.$router.push('/favoList')
     },
     reloadTweet() {
       axios.get('/api/whoAmI').then(res => {
