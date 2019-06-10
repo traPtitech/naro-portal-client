@@ -55,6 +55,7 @@ export default {
       password: null,
       message: '',
       isPush: false,
+      valid: false,
       nameRules: [
         v => !!v || 'ユーザ名は必須です',
         v => v.length <= 16 || 'ユーザ名は16文字までです',

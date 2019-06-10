@@ -2,30 +2,50 @@
   <v-layout justify-center>
     <v-flex sm8 xs12>
       <v-layout wrap column justify-center>
-        <v-layout
-          row
-          wrap
-          class="light-blue lighten-1 white--text headline"
-          justify-center
-          >{{ this.userName }}
-          <v-btn
-            outline
-            v-bind:disabled="isPush"
-            round
-            @click="changeToFavoList"
-            class="white white--text"
-            >MyFavoList</v-btn
-          >
-          <v-btn
-            outline
-            v-bind:disabled="isPush"
-            round
-            @click="logout"
-            class="white white--text"
-            >ログアウト</v-btn
-          ></v-layout
-        >
+        <v-flex sm4 xs5>
+          <v-layout wrap row justify-center class="light-blue lighten-1">
+            <v-flex sm4 xs5>
+              <v-select
+                v-model="userName"
+                item-text="userName"
+                :items="users"
+                menu-props="auto"
+                hide-details
+                m-0
+                p-0
+                class="white--text headline"
+              />
+            </v-flex>
 
+            <v-btn
+              outline
+              v-bind:disabled="isPush"
+              round
+              @click="loadTweet"
+              class="white white--text"
+              >see this user`s timeline</v-btn
+            >
+
+            <v-layout justify-end>
+              <v-btn
+                outline
+                v-bind:disabled="isPush"
+                round
+                @click="changeToFavoList"
+                class="white white--text"
+                >MyFavoList</v-btn
+              >
+              <v-btn
+                outline
+                v-bind:disabled="isPush"
+                round
+                @click="logout"
+                class="white white--text"
+                >ログアウト</v-btn
+              >
+            </v-layout>
+          </v-layout>
+        </v-flex>
         <v-form v-model="valid" lazy-validation>
           <v-layout justify-center>
             <v-flex sm6 xs9>
@@ -84,6 +104,7 @@
                 <v-icon>fa-thumbtack</v-icon>
               </v-btn>
             </v-layout>
+            <v-card-text contain>{{ tweet.tweet }}</v-card-text>
           </v-card-title>
         </v-card>
 
@@ -135,6 +156,7 @@ export default {
       isPush: false,
       isPin: false,
       valid: true,
+      users: null,
       upDateTweetTimer: null,
       tweetRule: [
         v => !!v || '空のTweetはできません',
@@ -235,12 +257,22 @@ export default {
     changeToFavoList() {
       this.$router.push('/favoList')
     },
-    reloadTweet() {
+    loadTweet() {
       axios.get('/api/whoAmI').then(res => {
         if (this.userName !== res.data.userName) {
           this.isPin = true
+        } else {
+          this.isPin = false
         }
       })
+      axios.get('/api/timeline/' + this.userName).then(res => {
+        this.tweets = res.data
+      })
+      axios.get('/api/timelinePin/' + this.userName).then(res => {
+        this.pins = res.data
+      })
+    },
+    reloadTweet() {
       axios.get('/api/reloadTimeline/' + this.userName).then(res => {
         if (res === 'new message exist') {
           axios.get('/api/timeline/' + this.userName).then(res => {
@@ -268,6 +300,9 @@ export default {
   beforeCreate() {
     axios.get('/api/whoAmI').then(res => {
       this.userName = res.data.userName
+      axios.get('/api/userName').then(res => {
+        this.users = res.data
+      })
       axios.get('/api/timeline/' + this.userName).then(res => {
         this.tweets = res.data
       })

@@ -26,11 +26,7 @@
           ></v-layout
         >
 
-        <v-card
-          v-for="tweet in favos"
-          :key="tweet.favoID"
-          class="amber lighten-4"
-        >
+        <v-card v-for="tweet in favos" :key="tweet.favoID">
           <v-card-title
             ><v-layout wrap row justify-center aline-center
               >{{ tweet.createdAt }}
