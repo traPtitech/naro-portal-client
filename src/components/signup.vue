@@ -24,6 +24,13 @@
             :rules="passwordRules"
             v-model="password"
           />
+          <v-card-text
+            v-for="message in messages"
+            :key="message"
+            class="red--text title"
+          >
+            {{ message }}
+          </v-card-text>
           <v-layout row wrap justify-center>
             <v-btn
               round
@@ -53,7 +60,7 @@ export default {
     return {
       name: null,
       password: null,
-      message: '',
+      messages: [],
       isPush: false,
       valid: false,
       nameRules: [
@@ -68,28 +75,25 @@ export default {
     }
   },
   methods: {
-    postSignup() {
+    async postSignup() {
       this.isPush = true
-      axios
+      await axios
         .post('/api/signup', {
           userName: this.name,
           userPassword: this.password,
         })
-        .then(res => {
-          this.$router.push('/')
-          this.isPush = false
-        })
         .catch(err => {
           if (err.response.status === 400) {
-            this.message = err.response.data.message
+            this.messages.push(err.response.data)
           } else {
-            console.error({
-              statusCode: err.response.status,
-              message: err.response.data.message,
-            })
+            this.messages.push('エラー')
           }
           this.isPush = false
         })
+      if (this.isPush) {
+        this.$router.push('/login')
+        this.isPush = false
+      }
     },
     changeToLogin() {
       this.$router.push('/login')

@@ -25,6 +25,14 @@
             v-model="password"
           />
 
+          <v-card-text
+            v-for="message in messages"
+            :key="message"
+            class="red--text title"
+          >
+            {{ message }}
+          </v-card-text>
+
           <v-layout row wrap justify-center>
             <v-btn
               round
@@ -55,7 +63,7 @@ export default {
     return {
       name: null,
       password: null,
-      message: '',
+      messages: [],
       isPush: false,
       valid: true,
       nameRules: [
@@ -70,21 +78,25 @@ export default {
     }
   },
   methods: {
-    postLogin() {
+    async postLogin() {
       this.isPush = true
-      axios
+      await axios
         .post('/api/login', {
           userName: this.name,
           userPassword: this.password,
         })
-        .then(res => {
-          if (res.data === 'OK') {
-            this.$router.push('/')
+        .catch(err => {
+          if (err.response.status === 403) {
+            this.messages.push('UserIDまたはPasswordが間違っています')
           } else {
-            this.message = '名前またはパスワードが間違っています'
+            this.messages.push('エラー')
           }
           this.isPush = false
         })
+      if (this.isPush) {
+        this.$router.push('/')
+        this.isPush = false
+      }
     },
     changeToSignup() {
       this.$router.push('/signup')
