@@ -2,15 +2,57 @@
   <v-layout justify-center>
     <v-flex sm8 xs12>
       <v-layout wrap column justify-center>
-        <v-layout row wrap class="light-blue lighten-1" justify-center
-          ><h1>{{ this.userName }}</h1>
-          <v-btn v-bind:disabled="isPush" round @click="logout" class="white"
-            ><span id="bottun">ログアウト</span></v-btn
+        <v-layout
+          row
+          wrap
+          class="light-blue lighten-1 white--text headline"
+          justify-center
+          >{{ this.userName }}
+          <v-btn
+            outline
+            v-bind:disabled="isPush"
+            round
+            @click="logout"
+            class="white white--text"
+            >ログアウト</v-btn
           ></v-layout
         >
 
-        <v-card v-for="tweet in tweets" :key="tweet.tweetID" class="tweet">
-          <v-card-text
+        <v-form v-model="valid" lazy-validation>
+          <v-layout justify-center>
+            <v-flex sm6 xs9>
+              <v-layout column>
+                <v-textarea
+                  maxlength="200"
+                  counter
+                  :rules="tweetRule"
+                  auto-grow
+                  rows="1"
+                  v-model="text"
+                />
+                <v-flex sm3 xs5>
+                  <v-layout justify-center>
+                    <v-btn
+                      round
+                      v-bind:disabled="isPush || !valid"
+                      @click="postTweet"
+                      class="light-blue lighten-1 white--text"
+                    >
+                      送信
+                    </v-btn>
+                  </v-layout>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+          </v-layout>
+        </v-form>
+
+        <v-card
+          v-for="tweet in pins"
+          :key="tweet.pinID"
+          class="amber lighten-4"
+        >
+          <v-card-title
             ><v-layout wrap row justify-center aline-center
               >{{ tweet.createdAt }}
               <v-btn
@@ -22,14 +64,49 @@
               >
                 <v-icon>favorite</v-icon>
               </v-btn>
-              {{ tweet.favoNum || 0 }}</v-layout
-            ></v-card-text
-          >
-          <v-card-text>{{ tweet.tweet }}</v-card-text>
+
+              {{ tweet.favoNum || 0 }}
+              <v-btn
+                flat
+                icon
+                color="amber darken-4"
+                v-bind:disabled="isPush || isPin"
+                @click="postPin(tweet.tweetID)"
+              >
+                <v-icon>fa-thumbtack</v-icon>
+              </v-btn>
+            </v-layout>
+          </v-card-title>
         </v-card>
 
-        <v-textarea v-model="text" />
-        <button v-bind:disabled="isPush" @click="postTweet">送信</button>
+        <v-card v-for="tweet in tweets" :key="tweet.tweetID">
+          <v-card-title
+            ><v-layout wrap row justify-center aline-center
+              >{{ tweet.createdAt }}
+              <v-btn
+                flat
+                icon
+                color="pink"
+                v-bind:disabled="isPush"
+                @click="postFavo(tweet.tweetID)"
+              >
+                <v-icon>favorite</v-icon>
+              </v-btn>
+              {{ tweet.favoNum || 0 }}
+              <v-btn
+                flat
+                icon
+                color="amber darken-4"
+                v-bind:disabled="isPush || isPin"
+                @click="postPin(tweet.tweetID)"
+              >
+                <v-icon>fa-thumbtack</v-icon>
+              </v-btn>
+            </v-layout></v-card-title
+          >
+
+          <v-card-text contain>{{ tweet.tweet }}</v-card-text>
+        </v-card>
       </v-layout>
     </v-flex>
   </v-layout>
@@ -44,10 +121,17 @@ export default {
     return {
       userName: null,
       tweets: null,
+      pins: null,
       text: '',
       message: '',
       isPush: false,
+      isPin: false,
+      valid: true,
       upDateTweetTimer: null,
+      tweetRule: [
+        v => !!v || '空のTweetはできません',
+        v => v.length <= 200 || 'Tweetの字数はは200文字までです',
+      ],
     }
   },
   methods: {
@@ -59,6 +143,9 @@ export default {
         axios.post('/api/tweet', { tweet: this.text }).then(() => {
           axios.get('/api/timeline/' + this.userName).then(res => {
             this.tweets = res.data
+          })
+          axios.get('/api/timelinePin/' + this.userName).then(res => {
+            this.pins = res.data
           })
         })
       }
@@ -80,6 +167,9 @@ export default {
                 this.tweets = res.data
                 this.isPush = false
               })
+              axios.get('/api/timelinePin/' + this.userName).then(res => {
+                this.pins = res.data
+              })
             })
         } else {
           axios
@@ -91,15 +181,62 @@ export default {
                 this.tweets = res.data
                 this.isPush = false
               })
+              axios.get('/api/timelinePin/' + this.userName).then(res => {
+                this.pins = res.data
+              })
+            })
+        }
+      })
+    },
+    postPin(tweetID) {
+      this.isPush = true
+      axios.get('/api/isPin/' + tweetID).then(res => {
+        if (res.data !== 'none') {
+          axios
+            .delete('/api/pin', {
+              data: {
+                tweetID: tweetID,
+              },
+            })
+            .then(() => {
+              axios.get('/api/timeline/' + this.userName).then(res => {
+                this.tweets = res.data
+                this.isPush = false
+              })
+              axios.get('/api/timelinePin/' + this.userName).then(res => {
+                this.pins = res.data
+              })
+            })
+        } else {
+          axios
+            .post('/api/pin', {
+              tweetID: tweetID,
+            })
+            .then(() => {
+              axios.get('/api/timeline/' + this.userName).then(res => {
+                this.tweets = res.data
+                this.isPush = false
+              })
+              axios.get('/api/timelinePin/' + this.userName).then(res => {
+                this.pins = res.data
+              })
             })
         }
       })
     },
     reloadTweet() {
+      axios.get('/api/whoAmI').then(res => {
+        if (this.userName !== res.data.userName) {
+          this.isPin = true
+        }
+      })
       axios.get('/api/reloadTimeline/' + this.userName).then(res => {
         if (res === 'new message exist') {
           axios.get('/api/timeline/' + this.userName).then(res => {
             this.tweets = res.data
+          })
+          axios.get('/api/timelinePin/' + this.userName).then(res => {
+            this.pins = res.data
           })
         }
       })
@@ -111,6 +248,7 @@ export default {
     },
   },
   mounted() {
+    this.valid = false
     this.upDateTweetTimer = setInterval(this.reloadTweet, 5000)
   },
   destroyed() {
@@ -121,6 +259,9 @@ export default {
       this.userName = res.data.userName
       axios.get('/api/timeline/' + this.userName).then(res => {
         this.tweets = res.data
+      })
+      axios.get('/api/timelinePin/' + this.userName).then(res => {
+        this.pins = res.data
       })
     })
   },

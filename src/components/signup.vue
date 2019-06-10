@@ -2,41 +2,45 @@
   <v-layout justify-center>
     <v-flex sm8 xs12>
       <v-layout wrap column justify-center>
-        <v-flex class="light-blue lighten-1"
-          ><v-layout justify-center><h1>サインアップ</h1></v-layout></v-flex
+        <v-layout
+          justify-center
+          class="light-blue lighten-1 white--text headline"
+          >サインアップ</v-layout
         >
 
-        <v-text-field
-          row="1"
-          :rules="nameRules"
-          label="UserID"
-          v-model="name"
-        />
+        <v-form v-model="valid" lazy-validation>
+          <v-text-field
+            row="1"
+            :rules="nameRules"
+            label="UserID"
+            v-model="name"
+          />
 
-        <v-text-field
-          counter
-          label="Password"
-          type="password"
-          row="1"
-          :rules="passwordRules"
-          v-model="password"
-        />
-        <v-layout row wrap justify-center>
-          <v-btn
-            round
-            v-bind:disabled="isPush"
-            @click="postSignup"
-            class="light-blue lighten-1"
-            ><span>サインアップ</span></v-btn
-          >
-          <v-btn
-            round
-            v-bind:disabled="isPush"
-            @click="changeToLogin"
-            class="light-blue lighten-1"
-            ><span>ログイン画面へ</span></v-btn
-          >
-        </v-layout>
+          <v-text-field
+            counter
+            label="Password"
+            type="password"
+            row="1"
+            :rules="passwordRules"
+            v-model="password"
+          />
+          <v-layout row wrap justify-center>
+            <v-btn
+              round
+              v-bind:disabled="isPush || !valid"
+              @click="postSignup"
+              class="light-blue lighten-1 white--text"
+              >サインアップ</v-btn
+            >
+            <v-btn
+              round
+              v-bind:disabled="isPush"
+              @click="changeToLogin"
+              class="light-blue lighten-1 white--text"
+              >ログイン画面へ</v-btn
+            >
+          </v-layout>
+        </v-form>
       </v-layout>
     </v-flex>
   </v-layout>
@@ -90,11 +94,8 @@ export default {
       this.$router.push('/login')
     },
   },
+  mounted() {
+    this.valid = false
+  },
 }
 </script>
-<style>
-#login {
-  margin-top: 60px;
-  text-align: center;
-}
-</style>
