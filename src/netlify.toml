@@ -1,0 +1,4 @@
+[[redirects]]
+  from = "/api"
+  to = "http://150.95.157.67:11400"
+  force=true
