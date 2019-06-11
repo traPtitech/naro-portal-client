@@ -87,8 +87,10 @@ export default {
         })
         .catch(err => {
           if (err.response.status === 403) {
+            this.messages = []
             this.messages.push('UserIDまたはPasswordが間違っています')
           } else {
+            this.messages = []
             this.messages.push('エラー')
           }
           this.isPush = false

@@ -86,6 +86,7 @@ export default {
           if (err.response.status === 400) {
             this.messages.push(err.response.data)
           } else {
+            this.messages = []
             this.messages.push('エラー')
           }
           this.isPush = false
