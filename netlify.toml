@@ -1,4 +1,4 @@
 [[redirects]]
   from = "/api/*"
-  to = "http://150.95.157.67:11400/:splat"
+  to = "http://twitter_clone_server.mazrean.trap.show/:splat"
   status = 200
