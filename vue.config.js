@@ -3,7 +3,7 @@ module.exports = {
   devServer: {
     proxy: {
       '^/api': {
-        target: 'http://150.95.157.67:11400',
+        target: 'http://twitter_clone_server.mazrean.trap.show/',
         pathRewrite: {
           '^/api/': '/',
         },
