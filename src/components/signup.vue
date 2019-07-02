@@ -91,7 +91,7 @@ export default {
           this.isPush = false
         })
       if (this.isPush) {
-        this.$router.push('/login')
+        this.$router.push('/')
         this.isPush = false
       }
     },
