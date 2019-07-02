@@ -75,67 +75,70 @@
           </v-layout>
         </v-form>
 
-        <v-card
-          v-for="tweet in pins"
-          :key="tweet.pinID"
-          class="amber lighten-4"
-        >
-          <v-card-title
-            ><v-layout wrap row justify-center aline-center
-              >{{ tweet.createdAt }}
-              <v-btn
-                flat
-                icon
-                color="pink"
-                v-bind:disabled="isPush"
-                @click="postFavo(tweet.tweetID)"
-              >
-                <v-icon>favorite</v-icon>
-              </v-btn>
-
-              {{ tweet.favoNum || 0 }}
-              <v-btn
-                flat
-                icon
-                color="amber darken-4"
-                v-bind:disabled="isPush || isPin"
-                @click="postPin(tweet.tweetID)"
-              >
-                <v-icon>fa-thumbtack</v-icon>
-              </v-btn>
-            </v-layout>
-            <v-card-text contain>{{ tweet.tweet }}</v-card-text>
-          </v-card-title>
-        </v-card>
-
-        <v-card v-for="tweet in tweets" :key="tweet.tweetID">
-          <v-card-title
-            ><v-layout wrap row justify-center aline-center
-              >{{ tweet.createdAt }}
-              <v-btn
-                flat
-                icon
-                color="pink"
-                v-bind:disabled="isPush"
-                @click="postFavo(tweet.tweetID)"
-              >
-                <v-icon>favorite</v-icon>
-              </v-btn>
-              {{ tweet.favoNum || 0 }}
-              <v-btn
-                flat
-                icon
-                color="amber darken-4"
-                v-bind:disabled="isPush || isPin"
-                @click="postPin(tweet.tweetID)"
-              >
-                <v-icon>fa-thumbtack</v-icon>
-              </v-btn>
-            </v-layout></v-card-title
+        <v-flex xs12>
+          <v-card
+            v-for="tweet in pins"
+            :key="tweet.pinID"
+            class="amber lighten-4"
           >
+            <v-card-title>
+              <v-layout wrap row justify-center aline-center
+                >{{ tweet.createdAt }}
+                <v-btn
+                  flat
+                  icon
+                  color="pink"
+                  v-bind:disabled="isPush"
+                  @click="postFavo(tweet.tweetID)"
+                >
+                  <v-icon>favorite</v-icon>
+                </v-btn>
 
-          <v-card-text contain>{{ tweet.tweet }}</v-card-text>
-        </v-card>
+                {{ tweet.favoNum || 0 }}
+                <v-btn
+                  flat
+                  icon
+                  color="amber darken-4"
+                  v-bind:disabled="isPush || isPin"
+                  @click="postPin(tweet.tweetID)"
+                >
+                  <v-icon>fa-thumbtack</v-icon>
+                </v-btn>
+              </v-layout>
+            </v-card-title>
+            <v-card-text>{{ tweet.tweet }}</v-card-text>
+          </v-card>
+        </v-flex>
+
+        <v-flex xs12>
+          <v-card v-for="tweet in tweets" :key="tweet.tweetID">
+            <v-card-title
+              ><v-layout wrap row justify-center aline-center
+                >{{ tweet.createdAt }}
+                <v-btn
+                  flat
+                  icon
+                  color="pink"
+                  v-bind:disabled="isPush"
+                  @click="postFavo(tweet.tweetID)"
+                >
+                  <v-icon>favorite</v-icon>
+                </v-btn>
+                {{ tweet.favoNum || 0 }}
+                <v-btn
+                  flat
+                  icon
+                  color="amber darken-4"
+                  v-bind:disabled="isPush || isPin"
+                  @click="postPin(tweet.tweetID)"
+                >
+                  <v-icon>fa-thumbtack</v-icon>
+                </v-btn>
+              </v-layout>
+            </v-card-title>
+            <v-card-text>{{ tweet.tweet }}</v-card-text>
+          </v-card>
+        </v-flex>
       </v-layout>
     </v-flex>
   </v-layout>
