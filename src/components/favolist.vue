@@ -53,7 +53,7 @@
                 </v-btn>
               </v-layout>
             </v-card-title>
-            <v-card-text contain>{{ tweet.tweet }}</v-card-text>
+            <v-card-text>{{ tweet.tweet }}</v-card-text>
           </v-card>
         </v-flex>
       </v-layout>

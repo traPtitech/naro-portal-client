@@ -13,3 +13,9 @@
     </v-container>
   </v-app>
 </template>
+
+<style>
+.v-card {
+  word-wrap: break-word;
+}
+</style>
