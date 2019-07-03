@@ -28,12 +28,18 @@
 
         <v-flex xs12>
           <v-card v-for="tweet in favos" :key="tweet.favoID">
-            <v-card-title>
+            <v-card-title class="pt-0 pb-0">
               <v-layout wrap row justify-center aline-center class="title">
                 {{ tweet.userName }}
               </v-layout>
               <v-layout wrap row justify-end align-center>
-                {{ tweet.createdAt }}
+                {{
+                  tweet.createdAt
+                    .replace('T', ' ')
+                    .replace('Z', '')
+                    .replace('-', '/')
+                    .replace('-', '/')
+                }}
                 <v-btn
                   flat
                   icon
@@ -56,7 +62,7 @@
                 </v-btn>
               </v-layout>
             </v-card-title>
-            <v-card-text>{{ tweet.tweet }}</v-card-text>
+            <v-card-text class="pt-0">{{ tweet.tweet }}</v-card-text>
           </v-card>
         </v-flex>
       </v-layout>

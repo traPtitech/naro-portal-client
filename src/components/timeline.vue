@@ -81,9 +81,15 @@
             :key="tweet.pinID"
             class="amber lighten-4"
           >
-            <v-card-title>
-              <v-layout wrap row justify-center aline-center
-                >{{ tweet.createdAt }}
+            <v-card-title class="pt-0 pb-0">
+              <v-layout wrap row justify-end align-center>
+                {{
+                  tweet.createdAt
+                    .replace('T', ' ')
+                    .replace('Z', '')
+                    .replace('-', '/')
+                    .replace('-', '/')
+                }}
                 <v-btn
                   flat
                   icon
@@ -106,15 +112,21 @@
                 </v-btn>
               </v-layout>
             </v-card-title>
-            <v-card-text>{{ tweet.tweet }}</v-card-text>
+            <v-card-text class="pt-0">{{ tweet.tweet }}</v-card-text>
           </v-card>
         </v-flex>
 
         <v-flex xs12>
           <v-card v-for="tweet in tweets" :key="tweet.tweetID">
-            <v-card-title
-              ><v-layout wrap row justify-center aline-center
-                >{{ tweet.createdAt }}
+            <v-card-title class="pt-0 pb-0">
+              <v-layout wrap row justify-end align-center>
+                {{
+                  tweet.createdAt
+                    .replace('T', ' ')
+                    .replace('Z', '')
+                    .replace('-', '/')
+                    .replace('-', '/')
+                }}
                 <v-btn
                   flat
                   icon
@@ -124,6 +136,7 @@
                 >
                   <v-icon>favorite</v-icon>
                 </v-btn>
+
                 {{ tweet.favoNum || 0 }}
                 <v-btn
                   flat
@@ -136,7 +149,7 @@
                 </v-btn>
               </v-layout>
             </v-card-title>
-            <v-card-text>{{ tweet.tweet }}</v-card-text>
+            <v-card-text class="pt-0">{{ tweet.tweet }}</v-card-text>
           </v-card>
         </v-flex>
       </v-layout>
