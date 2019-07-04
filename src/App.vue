@@ -33,11 +33,39 @@
     <v-container>
       <router-view />
     </v-container>
+
+    <v-dialog v-model="dialog1" width="500">
+      <v-card>
+        <v-card-text>
+          本当にアカウントを削除しますか？アカウントを削除すると復元はできません。
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat @click="delAccount">
+            Delete Account
+          </v-btn>
+          <v-btn color="primary" flat @click="dialog1 = false">
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" width="500">
+      <v-card>
+        <v-card-text>
+          アカウントを削除しました。1秒後に自動でログイン画面に移動します。
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 import axios from 'axios'
+import { setInterval, clearInterval } from 'timers'
 export default {
   name: 'app',
   data() {
@@ -61,7 +89,16 @@ export default {
             this.logout()
           },
         },
+        {
+          title: 'Delete Account',
+          change: () => {
+            this.dialog1 = true
+          },
+        },
       ],
+      dialog1: false,
+      dialog2: false,
+      timer: null,
       isVisible: true,
     }
   },
@@ -71,6 +108,16 @@ export default {
         this.$router.push('/login')
       })
     },
+    delAccount() {
+      axios.delete('/api/account', { data: {} })
+      this.dialog1 = false
+      this.dialog2 = true
+      this.timer = setInterval(this.changeToLogin, 1000)
+    },
+    changeToLogin() {
+      this.dialog2 = false
+      this.$router.push('/login')
+    },
   },
   watch: {
     $route: function(to, from) {
@@ -78,6 +125,9 @@ export default {
         this.isVisible = true
       } else if (to.path === '/login') {
         this.isVisible = false
+      }
+      if (this.timer !== null) {
+        clearInterval(this.timer, 1000)
       }
     },
   },
