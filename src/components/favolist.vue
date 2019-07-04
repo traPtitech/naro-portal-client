@@ -8,23 +8,7 @@
           class="light-blue lighten-1 white--text headline"
           justify-center
           >{{ this.userName }} FavoList
-          <v-btn
-            outline
-            v-bind:disabled="isPush"
-            round
-            @click="changeToTimeline"
-            class="white white--text"
-            >TimeLine</v-btn
-          >
-          <v-btn
-            outline
-            v-bind:disabled="isPush"
-            round
-            @click="logout"
-            class="white white--text"
-            >ログアウト</v-btn
-          ></v-layout
-        >
+        </v-layout>
 
         <v-flex xs12>
           <v-card v-for="tweet in favos" :key="tweet.favoID">

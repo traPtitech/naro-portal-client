@@ -3,7 +3,12 @@
     <v-flex sm6 xs12>
       <v-layout wrap column justify-center>
         <v-flex sm4 xs5>
-          <v-layout wrap row justify-center class="light-blue lighten-1">
+          <v-layout
+            wrap
+            row
+            justify-center
+            class="light-blue lighten-1 pb-2 pt-2"
+          >
             <v-flex sm4 xs5>
               <v-select
                 v-model="userName"
@@ -11,9 +16,7 @@
                 :items="users"
                 menu-props="auto"
                 hide-details
-                m-0
-                p-0
-                class="white--text headline"
+                class="white--text headline mt-0 pt-0"
               />
             </v-flex>
 
@@ -25,25 +28,6 @@
               class="white white--text"
               >see this user`s timeline</v-btn
             >
-
-            <v-layout justify-end>
-              <v-btn
-                outline
-                v-bind:disabled="isPush"
-                round
-                @click="changeToFavoList"
-                class="white white--text"
-                >MyFavoList</v-btn
-              >
-              <v-btn
-                outline
-                v-bind:disabled="isPush"
-                round
-                @click="logout"
-                class="white white--text"
-                >ログアウト</v-btn
-              >
-            </v-layout>
           </v-layout>
         </v-flex>
         <v-form v-model="valid" lazy-validation>
