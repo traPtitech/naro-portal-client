@@ -123,7 +123,7 @@ export default {
     $route: function(to, from) {
       if (to.path === '/' || to.path === '/favolist') {
         this.isVisible = true
-      } else if (to.path === '/login') {
+      } else if (to.path === '/login' || to.path === '/signup') {
         this.isVisible = false
       }
       if (this.timer !== null) {
