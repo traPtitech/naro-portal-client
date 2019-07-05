@@ -1,35 +1,120 @@
 <template>
-  <v-layout justify-center>
-    <v-flex sm6 xs12>
-      <v-layout wrap column justify-center>
-        <v-flex sm4 xs5>
-          <v-layout
-            wrap
-            row
-            justify-center
-            class="light-blue lighten-1 pb-2 pt-2"
-          >
-            <v-flex sm4 xs5>
-              <v-select
-                v-model="userName"
-                item-text="userName"
-                :items="users"
-                menu-props="auto"
-                hide-details
-                class="white--text headline mt-0 pt-0"
-              />
-            </v-flex>
-
-            <v-btn
-              outline
-              v-bind:disabled="isPush"
-              round
-              @click="loadTweet"
-              class="white white--text"
-              >see this user`s timeline</v-btn
+  <v-layout justify-center column>
+    <v-layout justify-center>
+      <v-flex sm6 xs12>
+        <v-layout wrap column justify-center>
+          <v-flex sm4 xs5>
+            <v-layout
+              wrap
+              row
+              justify-center
+              class="light-blue lighten-1 pb-2 pt-2"
             >
-          </v-layout>
-        </v-flex>
+              <v-flex sm4 xs5>
+                <v-select
+                  v-model="userName"
+                  item-text="userName"
+                  :items="users"
+                  menu-props="auto"
+                  hide-details
+                  class="white--text headline mt-0 pt-0"
+                />
+              </v-flex>
+
+              <v-btn
+                outline
+                v-bind:disabled="isPush"
+                round
+                @click="loadTweet"
+                class="white white--text"
+                >see this user`s timeline</v-btn
+              >
+            </v-layout>
+          </v-flex>
+          <v-flex xs12>
+            <v-card
+              v-for="tweet in pins"
+              :key="tweet.pinID"
+              class="amber lighten-4"
+            >
+              <v-card-title class="pt-0 pb-0">
+                <v-layout wrap row justify-end align-center>
+                  {{
+                    tweet.createdAt
+                      .replace('T', ' ')
+                      .replace('Z', '')
+                      .replace('-', '/')
+                      .replace('-', '/')
+                  }}
+                  <v-btn
+                    flat
+                    icon
+                    color="pink"
+                    v-bind:disabled="isPush"
+                    @click="postFavo(tweet.tweetID)"
+                  >
+                    <v-icon>favorite</v-icon>
+                  </v-btn>
+
+                  {{ tweet.favoNum || 0 }}
+                  <v-btn
+                    flat
+                    icon
+                    color="amber darken-4"
+                    v-bind:disabled="isPush || isPin"
+                    @click="postPin(tweet.tweetID)"
+                  >
+                    <v-icon>fa-thumbtack</v-icon>
+                  </v-btn>
+                </v-layout>
+              </v-card-title>
+              <v-card-text class="pt-0">{{ tweet.tweet }}</v-card-text>
+            </v-card>
+          </v-flex>
+
+          <v-flex xs12>
+            <v-card v-for="tweet in tweets" :key="tweet.tweetID">
+              <v-card-title class="pt-0 pb-0">
+                <v-layout wrap row justify-end align-center>
+                  {{
+                    tweet.createdAt
+                      .replace('T', ' ')
+                      .replace('Z', '')
+                      .replace('-', '/')
+                      .replace('-', '/')
+                  }}
+                  <v-btn
+                    flat
+                    icon
+                    color="pink"
+                    v-bind:disabled="isPush"
+                    @click="postFavo(tweet.tweetID)"
+                  >
+                    <v-icon>favorite</v-icon>
+                  </v-btn>
+
+                  {{ tweet.favoNum || 0 }}
+                  <v-btn
+                    flat
+                    icon
+                    color="amber darken-4"
+                    v-bind:disabled="isPush || isPin"
+                    @click="postPin(tweet.tweetID)"
+                  >
+                    <v-icon>fa-thumbtack</v-icon>
+                  </v-btn>
+                </v-layout>
+              </v-card-title>
+              <v-card-text class="pt-0">{{ tweet.tweet }}</v-card-text>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+    </v-layout>
+
+    <v-flex xs12>
+      <v-bottom-sheet hide-overlay persistent v-model="sheet" v-if="!isPin">
+        <template v-slot:activator></template>
         <v-form v-model="valid" lazy-validation>
           <v-layout justify-center>
             <v-flex sm6 xs9>
@@ -58,85 +143,7 @@
             </v-flex>
           </v-layout>
         </v-form>
-
-        <v-flex xs12>
-          <v-card
-            v-for="tweet in pins"
-            :key="tweet.pinID"
-            class="amber lighten-4"
-          >
-            <v-card-title class="pt-0 pb-0">
-              <v-layout wrap row justify-end align-center>
-                {{
-                  tweet.createdAt
-                    .replace('T', ' ')
-                    .replace('Z', '')
-                    .replace('-', '/')
-                    .replace('-', '/')
-                }}
-                <v-btn
-                  flat
-                  icon
-                  color="pink"
-                  v-bind:disabled="isPush"
-                  @click="postFavo(tweet.tweetID)"
-                >
-                  <v-icon>favorite</v-icon>
-                </v-btn>
-
-                {{ tweet.favoNum || 0 }}
-                <v-btn
-                  flat
-                  icon
-                  color="amber darken-4"
-                  v-bind:disabled="isPush || isPin"
-                  @click="postPin(tweet.tweetID)"
-                >
-                  <v-icon>fa-thumbtack</v-icon>
-                </v-btn>
-              </v-layout>
-            </v-card-title>
-            <v-card-text class="pt-0">{{ tweet.tweet }}</v-card-text>
-          </v-card>
-        </v-flex>
-
-        <v-flex xs12>
-          <v-card v-for="tweet in tweets" :key="tweet.tweetID">
-            <v-card-title class="pt-0 pb-0">
-              <v-layout wrap row justify-end align-center>
-                {{
-                  tweet.createdAt
-                    .replace('T', ' ')
-                    .replace('Z', '')
-                    .replace('-', '/')
-                    .replace('-', '/')
-                }}
-                <v-btn
-                  flat
-                  icon
-                  color="pink"
-                  v-bind:disabled="isPush"
-                  @click="postFavo(tweet.tweetID)"
-                >
-                  <v-icon>favorite</v-icon>
-                </v-btn>
-
-                {{ tweet.favoNum || 0 }}
-                <v-btn
-                  flat
-                  icon
-                  color="amber darken-4"
-                  v-bind:disabled="isPush || isPin"
-                  @click="postPin(tweet.tweetID)"
-                >
-                  <v-icon>fa-thumbtack</v-icon>
-                </v-btn>
-              </v-layout>
-            </v-card-title>
-            <v-card-text class="pt-0">{{ tweet.tweet }}</v-card-text>
-          </v-card>
-        </v-flex>
-      </v-layout>
+      </v-bottom-sheet>
     </v-flex>
   </v-layout>
 </template>
@@ -157,6 +164,7 @@ export default {
       isPin: false,
       valid: true,
       users: null,
+      sheet: true,
       upDateTweetTimer: null,
       tweetRule: [
         v => !!v || '空のTweetはできません',
