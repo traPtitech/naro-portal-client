@@ -72,63 +72,29 @@ export default {
   methods: {
     postFavo(tweetID) {
       this.isPush = true
-      axios.get('/api/isFavo/' + tweetID).then(res => {
-        if (res.data !== 'none') {
-          axios
-            .delete('/api/favo', {
-              data: {
-                tweetID: tweetID,
-              },
-            })
-            .then(() => {
-              axios.get('/api/timelineFavo/' + this.userName).then(res => {
-                this.favos = res.data
-                this.isPush = false
-              })
-            })
-        } else {
-          axios
-            .post('/api/favo', {
-              tweetID: tweetID,
-            })
-            .then(() => {
-              axios.get('/api/timelineFavo/' + this.userName).then(res => {
-                this.favos = res.data
-                this.isPush = false
-              })
-            })
-        }
-      })
+      axios
+        .post('/api/favo', {
+          tweetID: tweetID,
+        })
+        .then(() => {
+          axios.get('/api/timelineFavo/' + this.userName).then(res => {
+            this.favos = res.data
+            this.isPush = false
+          })
+        })
     },
     postPin(tweetID) {
       this.isPush = true
-      axios.get('/api/isPin/' + tweetID).then(res => {
-        if (res.data !== 'none') {
-          axios
-            .delete('/api/pin', {
-              data: {
-                tweetID: tweetID,
-              },
-            })
-            .then(() => {
-              axios.get('/api/timelineFavo/' + this.userName).then(res => {
-                this.favos = res.data
-                this.isPush = false
-              })
-            })
-        } else {
-          axios
-            .post('/api/pin', {
-              tweetID: tweetID,
-            })
-            .then(() => {
-              axios.get('/api/timelineFavo/' + this.userName).then(res => {
-                this.favos = res.data
-                this.isPush = false
-              })
-            })
-        }
-      })
+      axios
+        .post('/api/pin', {
+          tweetID: tweetID,
+        })
+        .then(() => {
+          axios.get('/api/timelineFavo/' + this.userName).then(res => {
+            this.favos = res.data
+            this.isPush = false
+          })
+        })
     },
     changeToTimeline() {
       this.$router.push('/')

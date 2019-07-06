@@ -192,75 +192,37 @@ export default {
     },
     postFavo(tweetID) {
       this.isPush = true
-      axios.get('/api/isFavo/' + tweetID).then(res => {
-        if (res.data !== 'none') {
-          axios
-            .delete('/api/favo', {
-              data: {
-                tweetID: tweetID,
-              },
-            })
-            .then(() => {
-              axios.get('/api/timeline/' + this.userName).then(res => {
-                this.tweets = res.data
-                this.isPush = false
-              })
-              axios.get('/api/timelinePin/' + this.userName).then(res => {
-                this.pins = res.data
-              })
-            })
-        } else {
-          axios
-            .post('/api/favo', {
-              tweetID: tweetID,
-            })
-            .then(() => {
-              axios.get('/api/timeline/' + this.userName).then(res => {
-                this.tweets = res.data
-                this.isPush = false
-              })
-              axios.get('/api/timelinePin/' + this.userName).then(res => {
-                this.pins = res.data
-              })
-            })
-        }
-      })
+      axios
+        .post('/api/favo', {
+          tweetID: tweetID,
+        })
+        .then(() => {
+          axios.get('/api/timeline/' + this.userName).then(res => {
+            this.tweets = res.data
+          })
+          axios.get('/api/timelinePin/' + this.userName).then(res => {
+            this.pins = res.data
+          })
+        })
+      this.text = ''
+      this.isPush = false
     },
     postPin(tweetID) {
       this.isPush = true
-      axios.get('/api/isPin/' + tweetID).then(res => {
-        if (res.data !== 'none') {
-          axios
-            .delete('/api/pin', {
-              data: {
-                tweetID: tweetID,
-              },
-            })
-            .then(() => {
-              axios.get('/api/timeline/' + this.userName).then(res => {
-                this.tweets = res.data
-                this.isPush = false
-              })
-              axios.get('/api/timelinePin/' + this.userName).then(res => {
-                this.pins = res.data
-              })
-            })
-        } else {
-          axios
-            .post('/api/pin', {
-              tweetID: tweetID,
-            })
-            .then(() => {
-              axios.get('/api/timeline/' + this.userName).then(res => {
-                this.tweets = res.data
-                this.isPush = false
-              })
-              axios.get('/api/timelinePin/' + this.userName).then(res => {
-                this.pins = res.data
-              })
-            })
-        }
-      })
+      axios
+        .post('/api/pin', {
+          tweetID: tweetID,
+        })
+        .then(() => {
+          axios.get('/api/timeline/' + this.userName).then(res => {
+            this.tweets = res.data
+          })
+          axios.get('/api/timelinePin/' + this.userName).then(res => {
+            this.pins = res.data
+          })
+        })
+      this.text = ''
+      this.isPush = false
     },
     changeToFavoList() {
       this.$router.push('/favoList')
