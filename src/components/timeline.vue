@@ -112,9 +112,23 @@
       </v-flex>
     </v-layout>
 
+    <v-bottom-sheet persistent hide-overlay v-model="sheet2" v-if="!isPin">
+      <v-layout justify-end>
+        <v-btn
+          flat
+          icon
+          color="grey darken-2"
+          v-bind:disabled="isPush || isPin"
+          @click="click"
+        >
+          <v-icon>fa-angle-double-up</v-icon>
+        </v-btn>
+      </v-layout>
+    </v-bottom-sheet>
+
     <v-flex xs12>
-      <v-bottom-sheet hide-overlay persistent v-model="sheet" v-if="!isPin">
-        <template v-slot:activator></template>
+      <v-bottom-sheet persistent hide-overlay v-model="sheet1" v-if="!isPin">
+        <template v-slot:activator> </template>
         <v-form v-model="valid" lazy-validation>
           <v-layout justify-center>
             <v-flex sm6 xs9>
@@ -143,6 +157,17 @@
             </v-flex>
           </v-layout>
         </v-form>
+        <v-layout justify-end>
+          <v-btn
+            flat
+            icon
+            color="grey darken-2"
+            v-bind:disabled="isPush || isPin"
+            @click="click"
+          >
+            <v-icon>fa-angle-double-down</v-icon>
+          </v-btn>
+        </v-layout>
       </v-bottom-sheet>
     </v-flex>
   </v-layout>
@@ -164,7 +189,8 @@ export default {
       isPin: false,
       valid: true,
       users: null,
-      sheet: true,
+      sheet1: true,
+      sheet2: false,
       upDateTweetTimer: null,
       tweetRule: [
         v => !!v || '空のTweetはできません',
@@ -258,6 +284,10 @@ export default {
       axios.post('/api/logout').then(() => {
         this.$router.push('/login')
       })
+    },
+    click() {
+      this.sheet1 = !this.sheet1
+      this.sheet2 = !this.sheet2
     },
   },
   mounted() {
