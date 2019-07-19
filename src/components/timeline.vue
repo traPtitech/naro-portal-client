@@ -129,7 +129,7 @@
     <v-flex xs12>
       <v-bottom-sheet persistent hide-overlay v-model="sheet1" v-if="!isPin">
         <template v-slot:activator> </template>
-        <v-form v-model="valid" lazy-validation>
+        <v-form v-model="valid">
           <v-layout justify-center>
             <v-flex sm6 xs9>
               <v-layout column>
