@@ -194,7 +194,9 @@ export default {
       upDateTweetTimer: null,
       tweetRule: [
         v => !!v || '空のTweetはできません',
-        v => !!v.replace(' ', '') || 'スペースのみのTweetはできません',
+        v =>
+          !!v.replace(' ', '').replace('　', '') ||
+          'スペースのみのTweetはできません',
         v => v.length <= 200 || 'Tweetの字数はは200文字までです',
       ],
     }
