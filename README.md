@@ -1,2 +1,2 @@
-# naro-portal-client
-Webエンジニアになろう講習会課題のポータルリポジトリ(Client)
+# twitter-clone-client
+Webエンジニアになろう講習会課題のクライアントリポジトリ
