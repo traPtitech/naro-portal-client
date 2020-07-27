@@ -1,2 +1,3 @@
-# naro-portal-client
-Webエンジニアになろう講習会課題のポータルリポジトリ(Client)
+# tesso Webエンジニアになろう講習会課題(Client)
+
+Webエンジニアになろう講習会課題のClient側レポジトリ
