@@ -1,14 +1,37 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> |
-      <router-link to="/login">Login</router-link> |
+      <router-link
+        :to="{
+          name: 'Profile',
+          params: { userId: userData.userid }
+        }"
+        >プロフィール</router-link
+      >
+      | <router-link :to="{ name: 'Home' }">ホーム</router-link> |
+      <router-link :to="{ name: 'Login' }">ログイン</router-link>
     </div>
     <router-view />
   </div>
 </template>
-
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {};
+  },
+  computed: {
+    userData() {
+      return this.$store.getters.userData;
+    }
+  },
+  mounted() {
+    axios.get("/api/whoami").then(res => {
+      this.$store.commit("updateUserData", res.data);
+    });
+  }
+};
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
