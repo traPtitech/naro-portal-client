@@ -7,14 +7,21 @@
     <div class="error" v-if="tweetError">
       1文字以上の入力が必要です！
     </div>
-    <el-input
-      type="text"
-      minlength="1"
-      maxlength="140"
-      placeholder="いまどうしてる？"
-      v-model="newText"
-    />
-    <el-button round type="primary" @click="onTweet()">ツイートする</el-button>
+    <el-form>
+      <el-form-item>
+        <el-input
+          type="textarea"
+          minlength="1"
+          maxlength="140"
+          placeholder="いまどうしてる？"
+          v-model="newText"
+      /></el-form-item>
+      <el-form-item>
+        <el-button round type="primary" @click="onTweet()"
+          >ツイートする</el-button
+        >
+      </el-form-item>
+    </el-form>
     <ul v-for="tl in tweetList" v-bind:key="tl.id">
       <p>
         <i class="el-icon-user-solid" /><b>{{ tl.username }} </b>
@@ -102,6 +109,11 @@ export default {
         axios.get("/api/list").then(res => {
           this.tweetList = res.data;
         });
+        this.$notify({
+          title: "ツイートを投稿しました",
+          duration: 2000
+        });
+        this.newText = "";
         return;
       }
     },
@@ -122,6 +134,10 @@ export default {
       this.tweetError = false;
       axios.get("/api/list").then(res => {
         this.tweetList = res.data;
+      });
+      this.$notify({
+        title: "ツイートを削除しました",
+        duration: 2000
       });
       return;
     },

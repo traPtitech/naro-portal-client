@@ -209,11 +209,16 @@ export default {
           text: target.text
         });
       } catch (_) {
-        this.tweetError = true;
         return;
       }
       this.tweetError = false;
-      this.$router.go({ path: this.$router.currentRoute.path, force: true });
+      axios.get("/api/list").then(res => {
+        this.tweetList = res.data;
+      });
+      this.$notify({
+        title: "ツイートを削除しました",
+        duration: 2000
+      });
       return;
     },
     async onFavorite(favoriteId) {

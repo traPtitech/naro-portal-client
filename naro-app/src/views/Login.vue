@@ -12,57 +12,73 @@
     </div>
     <div>
       <div class="error" v-if="loginError">
-        有効なIDとパスワードを入力してください！
+        ログインできませんでした。ユーザーIDとパスワードが正しいことを確認してください。
       </div>
-      <el-input
-        type="text"
-        minlength="1"
-        maxlength="140"
-        placeholder="ユーザーID"
-        v-model="userid"
-      />
-      <el-input
-        type="text"
-        minlength="1"
-        maxlength="140"
-        placeholder="パスワード"
-        v-model="password"
-      />
-    </div>
-    <div>
-      <el-button round type="primary" @click="onLogin()"
-        >ログインする</el-button
-      >
+      <el-form :model="loginForm" :rules="rules" ref="loginfForm">
+        <el-form-item prop="userid">
+          <el-input
+            type="text"
+            minlength="1"
+            maxlength="30"
+            placeholder="ユーザーID"
+            v-model="loginForm.userid"
+          />
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            type="text"
+            minlength="1"
+            maxlength="30"
+            placeholder="パスワード"
+            v-model="loginForm.password"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button round type="primary" @click="onLogin()"
+            >ログインする</el-button
+          >
+        </el-form-item>
+      </el-form>
     </div>
     <div>
       <h4>アカウントを持っていませんか？今すぐ作りましょう！</h4>
       <div class="error" v-if="registerError">
-        有効なIDとパスワードを入力してください！
+        このユーザーIDは既に使用されているか無効なIDです。別のIDを入力してください。
       </div>
-      <el-input
-        type="text"
-        minlength="1"
-        maxlength="140"
-        placeholder="ユーザーID"
-        v-model="newUserid"
-      />
-      <el-input
-        type="text"
-        minlength="1"
-        maxlength="140"
-        placeholder="アカウント名"
-        v-model="newUsername"
-      />
-      <el-input
-        type="text"
-        minlength="1"
-        maxlength="140"
-        placeholder="パスワード"
-        v-model="newPassword"
-      />
-      <el-button round type="primary" @click="onRegister()"
-        >アカウントを作成する</el-button
-      >
+      <el-form :model="registerForm" :rules="rules" ref="registerfForm">
+        <el-form-item>
+          <el-input
+            type="text"
+            minlength="1"
+            maxlength="30"
+            placeholder="ユーザーID"
+            v-model="registerForm.newUserid"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-input
+            type="text"
+            minlength="1"
+            maxlength="30"
+            placeholder="アカウント名"
+            v-model="registerForm.newUsername"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-input
+            type="text"
+            minlength="1"
+            maxlength="30"
+            placeholder="パスワード"
+            v-model="registerForm.newPassword"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button round type="primary" @click="onRegister()"
+            >アカウントを作成する</el-button
+          >
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
@@ -76,13 +92,54 @@ export default {
   },
   data() {
     return {
-      userid: "",
-      password: "",
-      newUserid: "",
-      newUsername: "",
-      newPassword: "",
       loginError: false,
-      registerError: false
+      registerError: false,
+      loginForm: {
+        userid: "",
+        password: ""
+      },
+      registerForm: {
+        newUserid: "",
+        newUsername: "",
+        newPassword: ""
+      },
+      rules: {
+        userid: [
+          {
+            required: true,
+            message: "ユーザーIDを入力してください",
+            trigger: "change"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: "パスワードを入力してください",
+            trigger: "change"
+          }
+        ],
+        newUserid: [
+          {
+            required: true,
+            message: "ユーザーIDを入力してください",
+            trigger: "change"
+          }
+        ],
+        newUsername: [
+          {
+            required: true,
+            message: "アカウント名を入力してください",
+            trigger: "change"
+          }
+        ],
+        newPassword: [
+          {
+            required: true,
+            message: "パスワードを入力してください",
+            trigger: "change"
+          }
+        ]
+      }
     };
   },
   computed: {
@@ -97,10 +154,11 @@ export default {
   },
   methods: {
     async onLogin() {
+      this.loginError = false;
       try {
         await axios.post("/api/login", {
-          userid: this.userid,
-          password: this.password
+          userid: this.loginForm.userid,
+          password: this.loginForm.password
         });
       } catch (_) {
         this.$nextTick(function() {
@@ -109,6 +167,11 @@ export default {
         return;
       }
       this.loginError = false;
+      this.$notify({
+        title: "ログイン成功",
+        message: "ようこそ、@" + this.loginForm.userid + "さん！",
+        duration: 2000
+      });
       this.$router.push("/");
       return;
     },
@@ -122,11 +185,12 @@ export default {
       return;
     },
     async onRegister() {
+      this.registerError = false;
       try {
         await axios.post("/api/signup", {
-          userid: this.newUserid,
-          username: this.newUsername,
-          password: this.newPassword
+          userid: this.registerForm.newUserid,
+          username: this.registerForm.newUsername,
+          password: this.registerForm.newPassword
         });
       } catch (_) {
         this.$nextTick(function() {
@@ -136,6 +200,11 @@ export default {
       }
       this.registerError = false;
       this.$router.go({ path: this.$router.currentRoute.path, force: true });
+      this.$notify({
+        title: "アカウント作成完了",
+        message: "次は作成したアカウントでログインしましょう",
+        duration: 2000
+      });
       return;
     }
   }
