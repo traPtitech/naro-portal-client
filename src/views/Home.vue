@@ -1,7 +1,6 @@
 <template>
   <div class="about" v-loading="loading">
-    <h2>Webエンジニアになろう講習会</h2>
-    <h1>Twitterクローン</h1>
+    <h1>Ayasetter(Twitterクローン)</h1>
     <h3>ようこそ！{{ userData.username }}さん！</h3>
     <p>あなたのユーザーID：@{{ userData.userid }}</p>
     <div class="error" v-if="tweetError">
