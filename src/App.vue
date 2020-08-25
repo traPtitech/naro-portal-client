@@ -32,7 +32,7 @@ export default {
     }
   },
   mounted() {
-    axios.get("//150.95.211.46:10400/ping").then(res => {
+    axios.get("http://150.95.211.46:10400/ping").then(res => {
       this.$store.commit("updateUserData", res.data);
     });
   }
