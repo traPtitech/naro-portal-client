@@ -24,7 +24,9 @@ export default {
   setup() {
     const username = ref('')
     const password = ref('')
-    const signin = () => axios.post("/api/signup", { username: username.value, password: password.value });
+    const signin = () => {
+      axios.post("/api/signup", { username: username.value, password: password.value })
+    };
     return { username, password, signin }
   }
 };

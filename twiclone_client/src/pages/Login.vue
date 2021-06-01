@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <h1>This is an login page</h1>
+    <h1>ログイン</h1>
     <div>
         ユーザー名: 
       <input type="text" v-model="username" />
@@ -24,7 +24,9 @@ export default {
   setup() {
     const username = ref('')
     const password = ref('')
-    const login = () => axios.post("/api/login", { username: username.value, password: password.value });
+    const login = () => {
+      axios.post("/api/login", { username: username.value, password: password.value })
+    };
     return { username, password, login }
   }
 };
