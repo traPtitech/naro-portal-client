@@ -1,0 +1,23 @@
+{
+  "name": "naro-portal-client",
+  "version": "1.0.0",
+  "description": "Webエンジニアになろう講習会課題のポータルリポジトリ(Client) ## languages purescriptを考えてる。",
+  "main": "index.js",
+  "scripts": {
+    "test": "spago test",
+    "build": "spago build && explorer.exe index.html",
+    "watch": "spago build --watch",
+    "start": "explorer.exe index.html",
+    "bundle": "spago bundle-app && explorer.exe index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yukikurage/naro-portal-client.git"
+  },
+  "author": "yukikurage",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yukikurage/naro-portal-client/issues"
+  },
+  "homepage": "https://github.com/yukikurage/naro-portal-client#readme"
+}
