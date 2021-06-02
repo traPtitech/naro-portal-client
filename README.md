@@ -1,4 +1,7 @@
-# naro-portal-client
-Webエンジニアになろう講習会課題のポータルリポジトリ(Client)
+# kurager-client
+
+Web エンジニアになろう講習会課題のポータルリポジトリ(Client)
+
 ## languages
-purescriptを考えてる。
+
+purescript を考えてる。
