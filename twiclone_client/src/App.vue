@@ -4,9 +4,9 @@
       <header :class="$style.header">
         <router-link to="/">ホーム</router-link> |
         <router-link to="/timelineall">全体タイムライン</router-link> |
-        <div v-if="displayUserName">
+        <div v-if="displayUserID">
           <router-link to="/tweet">つぶやく</router-link> |       
-          ログイン中: {{displayUserName}}
+          ログイン中: {{displayUserID}}
           </div>
         <div v-else>
           <router-link to="/login">ログイン</router-link> |
@@ -26,13 +26,13 @@
   import axios from "axios";
 export default{
 setup(){
-  const displayUserName=ref("")
+  const displayUserID=ref("")
   onMounted(async()=>{
     const res=await axios.get("api/whoami")
     console.log(res.data)
-    displayUserName.value=res.data.username;
+    displayUserID.value=res.data.userid;
   })
-  return{displayUserName}
+  return{displayUserID}
 }
 };
 </script>

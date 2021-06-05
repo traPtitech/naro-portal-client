@@ -3,7 +3,7 @@
     <h1>新規ユーザー登録</h1>
 <div>
         ユーザー名: 
-      <input type="text" v-model="username" />
+      <input type="text" v-model="userid" />
     </div>
     <div>
       パスワード: 
@@ -22,12 +22,12 @@ import { ref } from 'vue'
 export default {
   name: "Signin",
   setup() {
-    const username = ref('')
+    const userid = ref('')
     const password = ref('')
     const signin = () => {
-      axios.post("/api/signup", { username: username.value, password: password.value })
+      axios.post("/api/signup", { userid: userid.value, password: password.value })
     };
-    return { username, password, signin }
+    return { userid, password, signin }
   }
 };
 </script>
