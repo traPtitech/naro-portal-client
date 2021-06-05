@@ -12,7 +12,28 @@ to generate this file without the comments in this block.
 -}
 { name = "my-project"
 , dependencies =
-  [ "console", "effect", "halogen", "httpure", "prelude", "psci-support" ]
+  [ "aff"
+  , "aff-coroutines"
+  , "affjax"
+  , "argonaut-core"
+  , "console"
+  , "coroutines"
+  , "css"
+  , "effect"
+  , "either"
+  , "foreign-generic"
+  , "halogen"
+  , "halogen-css"
+  , "halogen-subscriptions"
+  , "maybe"
+  , "prelude"
+  , "psci-support"
+  , "routing"
+  , "strings"
+  , "tailrec"
+  , "transformers"
+  , "web-html"
+  ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
 }

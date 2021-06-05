@@ -1,12 +1,12 @@
 {
-  "name": "kurager-client",
+  "name": "kuragate-client",
   "version": "1.0.0",
   "description": "Webエンジニアになろう講習会課題のポータルリポジトリ(Client) ## languages purescriptを考えてる。",
   "main": "index.js",
   "scripts": {
     "test": "spago test",
     "start": "powershell.exe /c start $(wslpath -w index.html)",
-    "bundle": "spago bundle-app --to public/index.js"
+    "bundle": "spago bundle-app --to index.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/yukikurage/naro-portal-client#readme",
   "dependencies": {
-    "purty": "^7.0.0"
+    "spago": "^0.20.3",
+    "purty": "^7.0.0",
+    "xhr2": "^0.2.1"
   }
 }
