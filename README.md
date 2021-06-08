@@ -19,7 +19,7 @@ Router は currentPage や userProfile に変更があるたびに(Receive ア�
 
 ~~Login~~
 
-Home
+~~Home~~
 
 Settings
 

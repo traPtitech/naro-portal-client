@@ -24,9 +24,11 @@ import Src.Components.Home as Home
 import Src.Components.Login as Login
 import Src.Components.Settings as Settings
 import Src.Components.Signup as Signup
+import Src.LoginHandler as LoginHandler
 import Src.Profile (Profile)
 import Src.Routes as Routes
 import Src.Store as Store
+import Src.Wrapper.Exception (runExceptT)
 import Web.HTML (window)
 import Web.HTML.Event.HashChangeEvent (fromEvent, newURL)
 import Web.HTML.Event.HashChangeEvent.EventTypes (hashchange)
@@ -82,16 +84,30 @@ initialState = { currentPage: Routes.NotFoundPage, userProfile: Nothing }
 render :: forall m. MonadStore Store.Action Store.Store m => MonadAff m => State -> H.ComponentHTML Action Slots m
 render state = do
   HH.div [ HP.class_ $ H.ClassName "app" ]
-    $ case state.currentPage of
-        Routes.HomePage -> [ HH.slot_ Home._home unit Home.component {} ]
-        Routes.LoginPage -> [ HH.slot_ Login._login unit Login.component {} ]
-        Routes.SettingsPage -> [ HH.slot_ Settings._settings unit Settings.component {} ]
-        Routes.NotFoundPage -> [ HH.text "Page Not Found" ]
-        Routes.SignupPage -> [ HH.slot_ Signup._signup unit Signup.component {} ]
+    [ navigationBar state
+    , case state.currentPage of
+        Routes.HomePage -> HH.slot_ Home._home unit Home.component {}
+        Routes.LoginPage -> HH.slot_ Login._login unit Login.component {}
+        Routes.SettingsPage -> HH.slot_ Settings._settings unit Settings.component {}
+        Routes.NotFoundPage -> HH.text "Page Not Found"
+        Routes.SignupPage -> HH.slot_ Signup._signup unit Signup.component {}
+    ]
+
+-- | ナビゲーションバーを作成
+navigationBar :: forall w i. State -> HH.HTML w i
+navigationBar state = do
+  HH.div [ HP.class_ $ H.ClassName "navigation_bar" ]
+    [ navigationLink "#home" "Home" Routes.HomePage
+    , HH.text " | "
+    , navigationLink "#settings" "Settings" Routes.SettingsPage
+    ]
+  where
+  navigationLink url text page = HH.a [ HP.href url, HP.class_ $ H.ClassName if state.currentPage == page then "navigation_bar_selected" else "" ] [ HH.text text ]
 
 handleAction :: forall output m. MonadAff m => MonadStore Store.Action Store.Store m => Action -> H.HalogenM State Action Slots output m Unit
 handleAction = case _ of
   Initialize -> do --ユーザーが最初に着地したときの処理
+    _ <- runExceptT $ LoginHandler.updateUserProfile
     emitter <- H.liftEffect hashChangeEmitter
     _ <- H.subscribe emitter
     hashChangeHandler

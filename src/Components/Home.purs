@@ -4,19 +4,20 @@ import Prelude
 import Affjax as AX
 import Affjax.RequestBody as RequestBody
 import Affjax.ResponseFormat as ResponseFormat
-import Control.Monad.Except (runExcept)
-import Control.Monad.State (class MonadState)
-import Data.Argonaut.Core (fromNumber, fromString, stringify)
-import Data.Either (Either(..), either)
+import Control.Monad.State (get)
+import Data.Argonaut.Core (fromNumber)
+import Data.Either (either)
 import Data.Generic.Rep (class Generic)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
 import Effect.Aff.Class (class MonadAff)
-import Foreign.Generic (decodeJSON)
+import Effect.Console (log)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Src.Wrapper.Exception (ExceptT, except, runExceptT)
+import Src.Wrapper.Generic (jsonToRecord, recordToJson)
 import Type.Proxy (Proxy(..))
 
 type Slot id
@@ -36,8 +37,13 @@ type Post
     , fav_users :: Array String
     }
 
+newtype GetPostsResponseBody
+  = GetPostsResponseBody (Array Post)
+
 newtype PostRequestBody
   = PostRequestBody { text :: String }
+
+derive instance genericgetPostResponseBody :: Generic GetPostsResponseBody _
 
 derive instance genericPostRequestBody :: Generic PostRequestBody _
 
@@ -91,24 +97,29 @@ handleAction = case _ of
   UpdateTimeLine -> updatePosts
   Initialize -> updatePosts
   SetText text -> H.modify_ _ { text = text }
-  Post -> pure unit {- do
-    state <- H.get
-    _ <- H.liftAff $ AX.post ResponseFormat.ignore "api/updatepost" $ makeJsonRequest $ PostRequestBody { text: state.text }
+  Post -> do
+    state <- get
+    _ <- runExceptT <<< postAPI $ PostRequestBody { text: state.text }
     H.modify_ _ { text = "" }
-    updatePosts-}
+    updatePosts
   Fav postId -> do
-    _ <- H.liftAff $ AX.post ResponseFormat.ignore "api/favpost" $ Just $ RequestBody.json $ fromNumber $ toNumber $ postId
+    _ <- H.liftAff $ AX.post ResponseFormat.ignore "api/favpost" <<< Just <<< RequestBody.json <<< fromNumber <<< toNumber $ postId
+    pure unit
     updatePosts
 
--- | 投稿一覧を更新
-updatePosts :: forall a. Bind a => MonadAff a => MonadState State a => a Unit
-updatePosts = do
+postAPI :: forall m. Monad m => MonadAff m => PostRequestBody -> ExceptT m Unit
+postAPI req = do
+  requestJson <- recordToJson req
+  _ <- H.liftAff <<< AX.post ResponseFormat.ignore "api/updatepost" <<< Just <<< RequestBody.json $ requestJson
+  pure unit
+
+getPostsAPI :: forall m. MonadAff m => ExceptT m GetPostsResponseBody
+getPostsAPI = do
   result <- H.liftAff $ AX.get ResponseFormat.json "api/posts"
-  postsJSON <-
-    H.liftEffect
-      $ case result of
-          Left _ -> pure $ fromString ""
-          Right res -> pure res.body
-  let
-    postsEither = runExcept $ decodeJSON $ stringify postsJSON
-  either (const $ pure unit) (\posts -> H.modify_ _ { posts = posts }) postsEither
+  response <- except result
+  jsonToRecord response.body
+
+updatePosts :: forall output m. MonadAff m => H.HalogenM State Action () output m Unit
+updatePosts = do
+  eitherposts <- runExceptT getPostsAPI
+  either (H.liftEffect <<< log <<< show) (\posts -> H.modify_ _ { posts = (case _ of GetPostsResponseBody x -> x) $ posts }) eitherposts

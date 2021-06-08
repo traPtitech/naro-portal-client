@@ -36,7 +36,6 @@ login req = do
   when (response.status /= StatusCode 200) $ (throwError <<< error $ response.statusText) *> (liftEffect $ log "A") --その他のエラー
   profile <- whoami
   lift $ updateStore (Store.SetUserProfile (Just profile)) --Storeのユーザー情報を更新
-  pure unit
 
 whoami :: forall m. MonadAff m => ExceptT m Profile
 whoami = do
@@ -48,3 +47,8 @@ whoami = do
     throwError NotLoginError
   else
     throwError <<< error $ response.statusText
+
+updateUserProfile :: forall m. MonadStore Store.Action Store.Store m => MonadAff m => ExceptT m Unit
+updateUserProfile = do
+  profile <- whoami
+  lift $ updateStore (Store.SetUserProfile (Just profile)) --Storeのユーザー情報を更新
