@@ -7,6 +7,12 @@ import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
+import Halogen.Store.Monad (class MonadStore)
+import Routing.Hash (setHash)
+import Src.LoginHandler as LoginHandler
+import Src.Routes as Routes
+import Src.Store as Store
+import Src.Wrapper.Exception (runExceptT)
 import Type.Proxy (Proxy(..))
 
 type Slot id
@@ -20,7 +26,7 @@ type State
 data Action
   = Logout
 
-component :: forall query input output m. MonadAff m => H.Component query input output m
+component :: forall query input output m. MonadAff m => MonadStore Store.Action Store.Store m => H.Component query input output m
 component =
   H.mkComponent
     { initialState
@@ -36,8 +42,10 @@ render _ =
   HH.div_
     [ HH.button [ HE.onClick \_ -> Logout ] [ HH.text "Logout" ] ]
 
-handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
+handleAction :: forall output m. MonadAff m => MonadStore Store.Action Store.Store m => Action -> H.HalogenM State Action () output m Unit
 handleAction = case _ of
   Logout -> do
     _ <- H.liftAff $ AX.get ResponseFormat.ignore "api/logout"
+    H.liftEffect <<< setHash <<< Routes.pageToHash $ Routes.LoginPage
+    _ <- runExceptT $ LoginHandler.updateUserProfile
     pure unit

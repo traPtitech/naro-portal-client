@@ -5,7 +5,7 @@ import Affjax as AX
 import Affjax.RequestBody as RequestBody
 import Affjax.ResponseFormat as ResponseFormat
 import Affjax.StatusCode (StatusCode(..))
-import Control.Monad.Error.Class (throwError)
+import Control.Monad.Error.Class (catchError, throwError)
 import Control.Monad.Trans.Class (lift)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
@@ -30,7 +30,7 @@ derive instance genericLoginReqestBody :: Generic LoginRequestBody _
 login :: forall m. MonadStore Store.Action Store.Store m => MonadAff m => LoginRequestBody -> ExceptT m Unit
 login req = do
   reqJson <- recordToJson req --RecordをJSONに変換
-  result <- liftAff $ AX.post ResponseFormat.json "api/login" <<< Just <<< RequestBody.json $ reqJson --投げる
+  result <- liftAff $ AX.post ResponseFormat.ignore "api/login" <<< Just <<< RequestBody.json $ reqJson --投げる
   response <- except result --帰ってきたのをエラー処理
   when (response.status == StatusCode 403) $ throwError WrongPasswordError --パスが違うとき
   when (response.status /= StatusCode 200) $ (throwError <<< error $ response.statusText) *> (liftEffect $ log "A") --その他のエラー
@@ -41,7 +41,7 @@ whoami :: forall m. MonadAff m => ExceptT m Profile
 whoami = do
   result <- liftAff $ AX.get ResponseFormat.json "api/whoami"
   response <- except $ result
-  if response.status == StatusCode 200 then
+  if response.status == StatusCode 200 then do
     jsonToRecord $ response.body
   else if response.status == StatusCode 403 then -- StatusForbidden
     throwError NotLoginError
@@ -50,5 +50,5 @@ whoami = do
 
 updateUserProfile :: forall m. MonadStore Store.Action Store.Store m => MonadAff m => ExceptT m Unit
 updateUserProfile = do
-  profile <- whoami
-  lift $ updateStore (Store.SetUserProfile (Just profile)) --Storeのユーザー情報を更新
+  prof <- catchError (Just <$> whoami) (\err -> (liftEffect <<< log <<< show $ err) *> pure Nothing)
+  lift $ updateStore (Store.SetUserProfile prof) --Storeのユーザー情報を更新
