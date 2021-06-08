@@ -26,10 +26,10 @@ hashToPage = either (const NotFoundPage) identity <<< eitherRouter
   eitherRouter =
     match
       $ oneOf
-          [ HomePage <$ lit "#home"
-          , SettingsPage <$ lit "#settings"
-          , LoginPage <$ lit "#login"
-          , SignupPage <$ lit "#signup"
+          [ HomePage <$ lit "home"
+          , SettingsPage <$ lit "settings"
+          , LoginPage <$ lit "login"
+          , SignupPage <$ lit "signup"
           , pure HomePage
           ]
       <* end

@@ -21,6 +21,7 @@ data Error
   | AXError AX.Error --Affjaxのエラー
   | ForeignMultiError F.MultipleErrors -- Foreign.Genericのエラー
   | NotLoginError --ログインしていない
+  | WrongPasswordError --パスワードが違う
 
 -- | Src.Wrapper.Exception.Error型に特化したExceptT(名前を変えた方が良い？)
 data ExceptT m a
@@ -32,6 +33,7 @@ instance showError :: Show Error where
     AXError err -> AX.printError err
     ForeignMultiError err -> fold <<< map F.renderForeignError $ err
     NotLoginError -> "Please Login"
+    WrongPasswordError -> "Wrong Password!"
 
 instance functorExceptT :: Functor m => Functor (ExceptT m) where
   map f (ExceptT x) = ExceptT $ map f <$> x

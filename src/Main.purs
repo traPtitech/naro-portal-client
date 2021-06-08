@@ -1,7 +1,7 @@
 {-
 エントリポイント 
 -}
-module Src.App where
+module Main where
 
 import Prelude
 import Effect (Effect)
