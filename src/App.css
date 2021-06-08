@@ -1,0 +1,88 @@
+.app {
+  font-family: Century Gothic, Helvetica, Arial, sans-serif;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+  padding: 20px;
+}
+
+.navigation_bar {
+  margin-bottom: 10px;
+  font-size: 120%;
+}
+.navigation_bar_selected {
+  text-decoration: none;
+  color: rgb(102, 21, 21);
+  font-size: 130%;
+  font-weight: bold;
+}
+
+.post {
+  margin-top: 15px;
+}
+
+.login {
+  width: 280px;
+}
+.signup {
+  width: 400px;
+}
+.form {
+  background-color: #e6e3e4;
+  padding: 5px 10px;
+  margin: 0 auto;
+  width: 400px;
+}
+.form ul {
+  padding: 10px 10px;
+}
+.form ul li {
+  list-style: none;
+  margin-top: 10px;
+}
+.form ul li label {
+  margin-right: 5px;
+  width: 150px;
+  float: left;
+}
+input#submit_button {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+}
+.small {
+  font-size: 80%;
+}
+.error_massage {
+  color: rgb(199, 62, 85);
+}
+
+a:link {
+  text-decoration: none;
+  color: rgb(180, 94, 94);
+}
+a:visited {
+  text-decoration: none;
+  color: rgb(180, 94, 94);
+}
+a:hover {
+  text-decoration: none;
+  color: rgb(180, 94, 94);
+}
+a:active {
+  text-decoration: none;
+  color: rgb(180, 94, 94);
+}
+
+button {
+  font-family: Century Gothic, Helvetica, Arial, sans-serif;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 0px;
+  border: 1px solid #333;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+button:hover {
+  background-color: rgba(82, 7, 35, 0.178);
+}
