@@ -35,13 +35,16 @@ export default {
             password: password.value
         }
     )
-    const postLogin = () => axios.post(
-        "/api/login",
-        {
-            username: username.value,
-            password: password.value
-        }
-    )
+    const postLogin = () => {
+        axios.post(
+            "/api/login",
+            {
+                username: username.value,
+                password: password.value
+            }
+        )
+        //router.replace('/api/season')
+    }
     return {
       username, password,
       postSignUp, postLogin

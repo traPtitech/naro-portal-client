@@ -1,8 +1,8 @@
 <template>
     <h2>Home</h2>
-    <!--<button @click="toAccountHome">button</button>-->
+    <button @click="toAccountHome">button</button>
     <div>
-        <textarea v-model="Text" type="text" :class="$style.tweetarea" />
+        <textarea v-model="Text" type="text" :class="$style.tweetarea" v-on:keydown.ctrl.enter="postTweet" />
         <button @click="postTweet">Tweet</button>
     </div>
     <div v-for="tweet in tweets" :key="tweet.datetime">
@@ -37,15 +37,21 @@
 </style>
 
 <script>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, onBeforeUnmount } from "vue"
 import axios from "axios";
 
 export default {
     setup(){
-        const tweets = ref([]);
-        onMounted(async () => {
-            const res = await axios.get("/api/home")
-            tweets.value = res.data
+        const tweets = ref([])
+        const id = ref(0)
+        onMounted(() => {
+            id.value = setInterval(
+                async () => {
+                    const res = await axios.get("/api/home")
+                    tweets.value = res.data
+                },
+                3000
+            )
         })
         /*
         //var tweets = ref([])
@@ -55,15 +61,21 @@ export default {
                 var tweets = response.data
             })*/
         const Text = ref("");
-        const postTweet = () => axios.post("api/home", { text: Text.value, });
+        const postTweet = () => {
+            axios.post("api/home", { text: Text.value, });
+            Text.value = "";
+        }
 
         //const userid = ref("")
         //const toAccountHome = (userid) => router.push("api/" + userid)
-        /*function toAccountHome(){
+        const toAccountHome = () => {
             console.log("hello")
-            this.$router.replace('/api/season')
-        }*/
-        return { tweets, Text, postTweet };
+            this.$router.push('/season')
+        }
+        onBeforeUnmount(() => {
+            clear.Interval(id)
+        })
+        return { tweets, id, Text, postTweet, toAccountHome };
     }
 }
 </script>
