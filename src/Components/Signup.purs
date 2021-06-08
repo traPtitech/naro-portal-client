@@ -4,15 +4,21 @@ import Prelude
 import Affjax as AX
 import Affjax.RequestBody as RequestBody
 import Affjax.ResponseFormat as ResponseFormat
+import Affjax.StatusCode (StatusCode(..))
+import Control.Monad.Error.Class (throwError)
 import Data.Argonaut.Core (fromString, toBoolean)
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Effect.Aff.Class (class MonadAff)
+import Effect.Console (log)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Routing.Hash (setHash)
+import Src.Wrapper.Exception (ExceptT, error, except, runExceptT)
+import Src.Wrapper.Generic (recordToJson)
 import Type.Proxy (Proxy(..))
 import Web.Event.Event (Event, preventDefault)
 
@@ -100,19 +106,21 @@ handleAction = case _ of
   SetID id -> H.modify_ _ { id = id }
   SetPassWord password -> H.modify_ _ { password = password }
   SetName name -> H.modify_ _ { name = name }
-  Signup ev -> pure unit {- do
+  Signup ev -> do
     H.liftEffect $ preventDefault ev
     state <- H.get
-    _ <-
-      H.liftAff
-        $ AX.post ResponseFormat.ignore "api/signup"
-        $ makeJsonRequest
-        $ SignupRequestBody { id: state.id, name: state.name, password: state.password }
-    H.liftEffect $ setHash "#login"
-    H.liftEffect reload-}
+    result <- runExceptT <<< signUpAPI $ SignupRequestBody { id: state.id, name: state.name, password: state.password }
+    either (H.liftEffect <<< log <<< show) (\_ -> H.liftEffect $ setHash "#login") result
   CheckValidID -> do
     state <- H.get
     checkValid "api/isvalidid" state.id $ \x -> H.modify_ _ { validID = x }
+
+signUpAPI :: forall m. MonadAff m => SignupRequestBody -> ExceptT m Unit
+signUpAPI req = do
+  reqJson <- recordToJson req
+  result <- H.liftAff <<< AX.post ResponseFormat.ignore "api/signup" <<< Just <<< RequestBody.json $ reqJson
+  response <- except result
+  when (response.status /= StatusCode 200) $ throwError <<< error $ response.statusText
 
 checkValid ::
   forall output m.

@@ -32,21 +32,19 @@ login req = do
   reqJson <- recordToJson req --RecordをJSONに変換
   result <- liftAff $ AX.post ResponseFormat.ignore "api/login" <<< Just <<< RequestBody.json $ reqJson --投げる
   response <- except result --帰ってきたのをエラー処理
-  when (response.status == StatusCode 403) $ throwError WrongPasswordError --パスが違うとき
-  when (response.status /= StatusCode 200) $ (throwError <<< error $ response.statusText) *> (liftEffect $ log "A") --その他のエラー
-  profile <- whoami
+  when (response.status == StatusCode 403) $ throwError WrongPasswordError --パスワードが違うとき
+  when (response.status /= StatusCode 200) $ (throwError <<< error $ response.statusText) --その他のエラー
+  profile <- whoami --自分のユーザー情報を取得
   lift $ updateStore (Store.SetUserProfile (Just profile)) --Storeのユーザー情報を更新
 
+-- | 自分のユーザー情報を取得する関数
 whoami :: forall m. MonadAff m => ExceptT m Profile
 whoami = do
   result <- liftAff $ AX.get ResponseFormat.json "api/whoami"
   response <- except $ result
-  if response.status == StatusCode 200 then do
-    jsonToRecord $ response.body
-  else if response.status == StatusCode 403 then -- StatusForbidden
-    throwError NotLoginError
-  else
-    throwError <<< error $ response.statusText
+  when (response.status == StatusCode 403) $ throwError NotLoginError -- StatusForbidden
+  when (response.status /= StatusCode 200) $ throwError <<< error $ response.statusText
+  jsonToRecord $ response.body
 
 updateUserProfile :: forall m. MonadStore Store.Action Store.Store m => MonadAff m => ExceptT m Unit
 updateUserProfile = do
