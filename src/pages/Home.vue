@@ -72,9 +72,9 @@ export default {
             console.log("hello")
             this.$router.push('/season')
         }
-        onBeforeUnmount(() => {
+        /*onBeforeUnmount(() => {
             clear.Interval(id)
-        })
+        })*/
         return { tweets, id, Text, postTweet, toAccountHome };
     }
 }
