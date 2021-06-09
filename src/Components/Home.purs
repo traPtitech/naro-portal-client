@@ -1,23 +1,24 @@
 module Src.Components.Home where
 
 import Prelude
-import Affjax as AX
-import Affjax.RequestBody as RequestBody
-import Affjax.ResponseFormat as ResponseFormat
-import Control.Monad.State (get)
-import Data.Argonaut.Core (fromNumber)
-import Data.Either (either)
-import Data.Generic.Rep (class Generic)
-import Data.Int (toNumber)
+import Data.Array (elem)
+import Data.Either (either, note)
 import Data.Maybe (Maybe(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Console (log)
+import Halogen (lift)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Src.Wrapper.Exception (ExceptT, except, runExceptT)
-import Src.Wrapper.Generic (jsonToRecord, recordToJson)
+import Halogen.Store.Connect (Connected, connect)
+import Halogen.Store.Monad (class MonadStore)
+import Halogen.Store.Select (Selector, selectEq)
+import Src.APIs (MessageBody(..))
+import Src.APIs as APIs
+import Src.Profile (Profile(..))
+import Src.Store as Store
+import Src.Wrapper.Exception (Error(..), except, runExceptT)
 import Type.Proxy (Proxy(..))
 
 type Slot id
@@ -25,50 +26,45 @@ type Slot id
 
 _home = Proxy :: Proxy "home"
 
-type PostData  --命名規則が微妙(サーバー側ではコレがPostという型名)
-  = { id :: Int
-    , user_id :: String
-    , text :: String
-    , post_time :: String
-    }
-
-type Post
-  = { post_data :: PostData
-    , fav_users :: Array String
-    }
-
-newtype GetPostsResponseBody
-  = GetPostsResponseBody (Array Post)
-
-newtype PostRequestBody
-  = PostRequestBody { text :: String }
-
-derive instance genericgetPostResponseBody :: Generic GetPostsResponseBody _
-
-derive instance genericPostRequestBody :: Generic PostRequestBody _
-
 type State
-  = { posts :: Array Post
+  = { messages :: APIs.MessagesBody
     , text :: String
+    , userProfile :: Maybe Profile
     }
 
 data Action
-  = UpdateTimeLine
+  = Receive (Connected DerivingState Input)
+  | UpdateTimeLine
   | Initialize
   | SetText String
   | Post
   | Fav Int
 
-component :: forall query input output m. MonadAff m => H.Component query input output m
-component =
-  H.mkComponent
-    { initialState
-    , render
-    , eval: H.mkEval H.defaultEval { handleAction = handleAction, initialize = Just Initialize }
-    }
+-- | Storeと同期するStateの選択
+type DerivingState
+  = Maybe Profile
 
-initialState :: forall input. input -> State
-initialState _ = { posts: [], text: "" }
+type Input
+  = Unit
+
+-- | StoreからのInputでStoreとStateを同期する関数
+deriveState :: Connected DerivingState Input -> State -> State
+deriveState conInput = _ { userProfile = conInput.context }
+
+selectDerivingState :: Selector Store.Store DerivingState
+selectDerivingState = selectEq \store -> store.userProfile
+
+component :: forall query output m. MonadAff m => MonadStore Store.Action Store.Store m => H.Component query Input output m
+component =
+  connect selectDerivingState
+    $ H.mkComponent
+        { initialState: (\x -> deriveState x initialState)
+        , render
+        , eval: H.mkEval H.defaultEval { handleAction = handleAction, initialize = Just Initialize }
+        }
+
+initialState :: State
+initialState = { messages: APIs.MessagesBody [], text: "", userProfile: Nothing }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
@@ -81,45 +77,65 @@ render state =
         , HH.button [ HE.onClick (\_ -> Post) ] [ HH.text "Post" ]
         ]
     , HH.div_
-        $ map postBlock state.posts
+        $ map postBlock messages
     ]
+  where
+  (APIs.MessagesBody messages) = state.messages
 
-postBlock :: forall w. Post -> HH.HTML w Action
-postBlock post =
+postBlock :: forall w. APIs.Message -> HH.HTML w Action
+postBlock message = do
   HH.div [ HP.class_ $ H.ClassName "post" ]
-    $ [ HH.div_ [ HH.text $ "@" <> post.post_data.user_id ]
-      , HH.div_ [ HH.text $ post.post_data.text ]
-      , HH.div_ $ [ HH.button [ HE.onClick \_ -> Fav post.post_data.id ] [ HH.text "❤" ] ] <> map (\x -> HH.text $ " " <> x <> " ") post.fav_users
+    $ [ HH.div_ [ HH.text $ "@" <> message.user_id ]
+      , HH.div_ [ HH.text $ message.text ]
+      , HH.div_
+          $ [ HH.button [ HE.onClick \_ -> Fav message.id ] [ HH.text "❤" ] ]
+          <> map (\x -> HH.text $ " " <> x <> " ") message.fav_users
       ]
 
-handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
+handleAction :: forall output m. MonadAff m => MonadStore Store.Action Store.Store m => Action -> H.HalogenM State Action () output m Unit
 handleAction = case _ of
-  UpdateTimeLine -> updatePosts
-  Initialize -> updatePosts
+  UpdateTimeLine -> updateMessages
+  Initialize -> updateMessages
   SetText text -> H.modify_ _ { text = text }
-  Post -> do
-    state <- get
-    _ <- runExceptT <<< postAPI $ PostRequestBody { text: state.text }
-    H.modify_ _ { text = "" }
-    updatePosts
-  Fav postId -> do
-    _ <- H.liftAff $ AX.post ResponseFormat.ignore "api/favpost" <<< Just <<< RequestBody.json <<< fromNumber <<< toNumber $ postId
-    pure unit
-    updatePosts
+  Post -> handlePost
+  Fav id -> handleFav id
+  Receive input -> do
+    H.modify_ $ deriveState input --Storeの同期
 
-postAPI :: forall m. Monad m => MonadAff m => PostRequestBody -> ExceptT m Unit
-postAPI req = do
-  requestJson <- recordToJson req
-  _ <- H.liftAff <<< AX.post ResponseFormat.ignore "api/updatepost" <<< Just <<< RequestBody.json $ requestJson
-  pure unit
+handlePost :: forall output m. MonadAff m => H.HalogenM State Action () output m Unit
+handlePost = do
+  state <- H.get
+  result <- runExceptT <<< APIs.postMessage $ APIs.PostMessageRequestBody { text: state.text }
+  either failPostMessage successPostMessage result
+  where
+  failPostMessage = H.liftEffect <<< log <<< show
 
-getPostsAPI :: forall m. MonadAff m => ExceptT m GetPostsResponseBody
-getPostsAPI = do
-  result <- H.liftAff $ AX.get ResponseFormat.json "api/posts"
-  response <- except result
-  jsonToRecord response.body
+  successPostMessage _ = updateMessages
 
-updatePosts :: forall output m. MonadAff m => H.HalogenM State Action () output m Unit
-updatePosts = do
-  eitherposts <- runExceptT getPostsAPI
-  either (H.liftEffect <<< log <<< show) (\posts -> H.modify_ _ { posts = (case _ of GetPostsResponseBody x -> x) $ posts }) eitherposts
+-- | 二回目に押したなら解除
+handleFav :: forall output m. MonadAff m => MonadStore Store.Action Store.Store m => Int -> H.HalogenM State Action () output m Unit
+handleFav id = do
+  result <- runExceptT api
+  either failPostMessage successPostMessage result
+  where
+  api = do
+    state <- lift H.get
+    Profile prof <- except $ note NotLoginError state.userProfile
+    (MessageBody message) <- APIs.message id
+    if prof.id `elem` message.fav_users then
+      APIs.unFav id
+    else
+      APIs.fav id
+
+  failPostMessage = H.liftEffect <<< log <<< show
+
+  successPostMessage _ = updateMessages
+
+updateMessages :: forall output m. MonadAff m => H.HalogenM State Action () output m Unit
+updateMessages = do
+  eithermessages <- runExceptT APIs.messages
+  either failGetMessages successGetMessages eithermessages
+  where
+  failGetMessages = H.liftEffect <<< log <<< show
+
+  successGetMessages messages = H.modify_ _ { messages = messages }

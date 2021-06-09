@@ -24,7 +24,7 @@ import Src.Components.Home as Home
 import Src.Components.Login as Login
 import Src.Components.Settings as Settings
 import Src.Components.Signup as Signup
-import Src.LoginHandler as LoginHandler
+import Src.APIs as APIs
 import Src.Profile (Profile)
 import Src.Routes as Routes
 import Src.Store as Store
@@ -41,7 +41,7 @@ type Slots
   = ( login :: Login.Slot Unit, home :: Home.Slot Unit, settings :: Settings.Slot Unit, signup :: Signup.Slot Unit )
 
 type State
-  = { currentPage :: Routes.Page, userProfile :: Maybe (Profile) }
+  = { currentPage :: Routes.Page, userProfile :: Maybe Profile }
 
 -- | Storeと同期するStateの選択
 type DerivingState
@@ -86,7 +86,7 @@ render state = do
   HH.div [ HP.class_ $ H.ClassName "app" ]
     [ navigationBar state
     , case state.currentPage of
-        Routes.HomePage -> HH.slot_ Home._home unit Home.component {}
+        Routes.HomePage -> HH.slot_ Home._home unit Home.component unit
         Routes.LoginPage -> HH.slot_ Login._login unit Login.component {}
         Routes.SettingsPage -> HH.slot_ Settings._settings unit Settings.component {}
         Routes.NotFoundPage -> HH.text "Page Not Found"
@@ -102,12 +102,15 @@ navigationBar state = do
     , navigationLink "#settings" "Settings" Routes.SettingsPage
     ]
   where
-  navigationLink url text page = HH.a [ HP.href url, HP.class_ $ H.ClassName if state.currentPage == page then "navigation_bar_selected" else "" ] [ HH.text text ]
+  navigationLink url text page =
+    HH.a
+      [ HP.href url, HP.class_ $ H.ClassName if state.currentPage == page then "navigation_bar_selected" else "" ]
+      [ HH.text text ]
 
 handleAction :: forall output m. MonadAff m => MonadStore Store.Action Store.Store m => Action -> H.HalogenM State Action Slots output m Unit
 handleAction = case _ of
   Initialize -> do --ユーザーが最初に着地したときの処理
-    _ <- runExceptT $ LoginHandler.updateUserProfile
+    _ <- runExceptT $ APIs.updateUserProfile
     emitter <- H.liftEffect hashChangeEmitter
     _ <- H.subscribe emitter
     hashChangeHandler

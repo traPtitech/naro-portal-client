@@ -4,16 +4,14 @@ import Prelude
 import Data.Either (either)
 import Data.Generic.Rep (class Generic)
 import Effect.Aff.Class (class MonadAff)
-import Effect.Class (class MonadEffect)
 import Effect.Console (log)
-import Halogen (get)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.Store.Monad (class MonadStore)
 import Routing.Hash (setHash)
-import Src.LoginHandler as LoginHandler
+import Src.APIs as APIs
 import Src.Routes as Routes
 import Src.Store as Store
 import Src.Wrapper.Exception (Error(..), runExceptT)
@@ -101,23 +99,17 @@ handleAction = case _ of
   SetPassWord password -> H.modify_ _ { password = password }
   Login ev -> do
     H.liftEffect $ preventDefault ev
-    state <- get
-    result <- runExceptT $ LoginHandler.login $ LoginHandler.LoginRequestBody { id: state.id, password: state.password }
+    state <- H.get
+    result <- runExceptT $ APIs.login $ APIs.LoginRequestBody { id: state.id, password: state.password }
     either loginFail loginSuccess result
-    pure unit
+  where
+  -- | ログイン失敗時
+  loginFail = case _ of
+    WrongPasswordError -> H.modify_ _ { passState = WrongPassword }
+    err -> do
+      H.liftEffect <<< log <<< show $ err
+      H.modify_ _ { passState = InternalError }
 
-loginFail ::
-  forall output m.
-  MonadEffect m => Error -> H.HalogenM State Action () output m Unit
-loginFail = case _ of
-  WrongPasswordError -> H.modify_ _ { passState = WrongPassword }
-  err -> do
-    H.liftEffect <<< log <<< show $ err
-    H.modify_ _ { passState = InternalError }
-
-loginSuccess ::
-  forall output m.
-  MonadEffect m =>
-  MonadStore Store.Action Store.Store m => Unit -> H.HalogenM State Action () output m Unit
-loginSuccess _ = do
-  H.liftEffect <<< setHash <<< Routes.pageToHash $ Routes.HomePage --ページ遷移
+  -- | ログイン成功時
+  loginSuccess _ = do
+    H.liftEffect <<< setHash <<< Routes.pageToHash $ Routes.HomePage --ページ遷移

@@ -6,15 +6,10 @@ import Data.Argonaut.Parser (jsonParser)
 import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
 import Data.Identity (Identity(..))
-import Foreign.Generic (class GenericDecode, class GenericEncode, SumEncoding, defaultOptions, genericDecodeJSON, genericEncodeJSON)
+import Foreign.Generic (class GenericDecode, class GenericEncode, Options, defaultOptions, genericDecodeJSON, genericEncodeJSON)
 import Src.Wrapper.Exception (convExceptT, error, ExceptT, except, runExceptT)
 
-opts ::
-  { fieldTransform :: String -> String
-  , sumEncoding :: SumEncoding
-  , unwrapSingleArguments :: Boolean
-  , unwrapSingleConstructors :: Boolean
-  }
+opts :: Options
 opts = defaultOptions { unwrapSingleConstructors = true }
 
 -- | レコードをJSONに変換

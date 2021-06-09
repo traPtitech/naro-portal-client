@@ -6,11 +6,11 @@ module Src.Profile where
 import Prelude
 import Data.Generic.Rep (class Generic)
 
-data Profile
+newtype Profile
   = Profile
-    { id :: String
-    , name :: String
-    }
+  { id :: String
+  , name :: String
+  }
 
 derive instance genericProfile :: Generic Profile _
 

@@ -9,7 +9,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.Store.Monad (class MonadStore)
 import Routing.Hash (setHash)
-import Src.LoginHandler as LoginHandler
+import Src.APIs as APIs
 import Src.Routes as Routes
 import Src.Store as Store
 import Src.Wrapper.Exception (runExceptT)
@@ -47,5 +47,5 @@ handleAction = case _ of
   Logout -> do
     _ <- H.liftAff $ AX.get ResponseFormat.ignore "api/logout"
     H.liftEffect <<< setHash <<< Routes.pageToHash $ Routes.LoginPage
-    _ <- runExceptT $ LoginHandler.updateUserProfile
+    _ <- runExceptT $ APIs.updateUserProfile
     pure unit
