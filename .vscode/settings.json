@@ -1,0 +1,3 @@
+{
+  "purescript-dependency-graph.selectedModules": "Src\\.?.*"
+}
