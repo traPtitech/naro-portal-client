@@ -1,45 +1,61 @@
 ```mermaid
-flowchart TB
-subgraph Src[Src]
-Src.APIs[APIs]
-subgraph Src.Components[Components]
-Src.Components.Home[Home]
-Src.Components.Login[Login]
-Src.Components.Settings[Settings]
-Src.Components.Signup[Signup]
+flowchart 
+Main[Main]
+subgraph Kuragate_subgraph [Kuragate]
+Kuragate[/Kuragate/]
+Kuragate.Components.Router[Router]
+Kuragate.Store[Store]
+subgraph Kuragate.Classes_subgraph [Classes]
+Kuragate.Classes[/Classes/]
+Kuragate.Classes.LoginHandler[LoginHandler]
+Kuragate.Classes.MessagesHandler[MessagesHandler]
+Kuragate.Classes.NavigationHandler[NavigationHandler]
+Kuragate.Classes.RegistrationHandler[RegistrationHandler]
 end
-Src.Profile[Profile]
-Src.Router[Router]
-Src.Routes[Routes]
-Src.Store[Store]
-subgraph Src.Wrapper[Wrapper]
-Src.Wrapper.Exception[Exception]
-Src.Wrapper.Generic[Generic]
+subgraph Kuragate.Components_subgraph [Components]
+Kuragate.Components[/Components/]
+Kuragate.Components.Home[Home]
+Kuragate.Components.Login[Login]
+Kuragate.Components.Register[Register]
+Kuragate.Components.Settings[Settings]
+end
+subgraph Kuragate.Data_subgraph [Data]
+Kuragate.Data[/Data/]
+Kuragate.Data.Message[Message]
+Kuragate.Data.Page[Page]
+Kuragate.Data.Profile[Profile]
 end
 end
-Src.APIs --> Src.Profile
-Src.APIs --> Src.Store
-Src.APIs --> Src.Wrapper.Exception
-Src.APIs --> Src.Wrapper.Generic
-Src.Components.Home --> Src.APIs
-Src.Components.Home --> Src.Profile
-Src.Components.Home --> Src.Wrapper.Exception
-Src.Components.Login --> Src.APIs
-Src.Components.Login --> Src.Routes
-Src.Components.Login --> Src.Wrapper.Exception
-Src.Components.Settings --> Src.APIs
-Src.Components.Settings --> Src.Routes
-Src.Components.Settings --> Src.Wrapper.Exception
-Src.Components.Signup --> Src.Wrapper.Exception
-Src.Components.Signup --> Src.Wrapper.Generic
-Src.Router --> Src.APIs
-Src.Router --> Src.Components.Home
-Src.Router --> Src.Components.Login
-Src.Router --> Src.Components.Settings
-Src.Router --> Src.Components.Signup
-Src.Router --> Src.Profile
-Src.Router --> Src.Routes
-Src.Router --> Src.Wrapper.Exception
-Src.Store --> Src.Profile
-Src.Wrapper.Generic --> Src.Wrapper.Exception
+Main --> Kuragate.Components.Router
+Main --> Kuragate.Store
+Kuragate.Components.Router --> Kuragate.Classes.LoginHandler
+Kuragate.Components.Router --> Kuragate.Classes.MessagesHandler
+Kuragate.Components.Router --> Kuragate.Classes.NavigationHandler
+Kuragate.Components.Router --> Kuragate.Classes.RegistrationHandler
+Kuragate.Components.Router --> Kuragate.Components.Home
+Kuragate.Components.Router --> Kuragate.Components.Login
+Kuragate.Components.Router --> Kuragate.Components.Register
+Kuragate.Components.Router --> Kuragate.Components.Settings
+Kuragate.Components.Router --> Kuragate.Data.Page
+Kuragate.Components.Router --> Kuragate.Store
+Kuragate.Store --> Kuragate.Data.Profile
+Kuragate.Classes.LoginHandler --> Kuragate.Data.Profile
+Kuragate.Classes.MessagesHandler --> Kuragate.Data.Message
+Kuragate.Classes.NavigationHandler --> Kuragate.Data.Page
+Kuragate.Components.Home --> Kuragate.Classes.LoginHandler
+Kuragate.Components.Home --> Kuragate.Classes.MessagesHandler
+Kuragate.Components.Home --> Kuragate.Data.Message
+Kuragate.Components.Home --> Kuragate.Data.Profile
+Kuragate.Components.Home --> Kuragate.Store
+Kuragate.Components.Login --> Kuragate.Classes.LoginHandler
+Kuragate.Components.Login --> Kuragate.Classes.NavigationHandler
+Kuragate.Components.Login --> Kuragate.Data.Page
+Kuragate.Components.Login --> Kuragate.Store
+Kuragate.Components.Register --> Kuragate.Classes.NavigationHandler
+Kuragate.Components.Register --> Kuragate.Classes.RegistrationHandler
+Kuragate.Components.Register --> Kuragate.Data.Page
+Kuragate.Components.Settings --> Kuragate.Classes.LoginHandler
+Kuragate.Components.Settings --> Kuragate.Classes.NavigationHandler
+Kuragate.Components.Settings --> Kuragate.Data.Page
+Kuragate.Components.Settings --> Kuragate.Store
 ```

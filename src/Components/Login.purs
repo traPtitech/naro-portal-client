@@ -1,20 +1,16 @@
-module Src.Components.Login where
+module Kuragate.Components.Login where
 
 import Prelude
-import Data.Either (either)
-import Data.Generic.Rep (class Generic)
 import Effect.Aff.Class (class MonadAff)
-import Effect.Console (log)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.Store.Monad (class MonadStore)
-import Routing.Hash (setHash)
-import Src.APIs as APIs
-import Src.Routes as Routes
-import Src.Store as Store
-import Src.Wrapper.Exception (Error(..), runExceptT)
+import Kuragate.Classes.LoginHandler (class LoginHandler, login)
+import Kuragate.Classes.NavigationHandler (class NavigationHandler, navigate)
+import Kuragate.Data.Page (Page(..))
+import Kuragate.Store as Store
 import Type.Proxy (Proxy(..))
 import Web.Event.Event (preventDefault)
 import Web.Event.Internal.Types (Event)
@@ -40,12 +36,13 @@ data PassState
   | WrongPassword
   | InternalError
 
-newtype LoginReqestBody
-  = LoginReqestBody { id :: String, password :: String }
-
-derive instance genericLoginReqestBody :: Generic LoginReqestBody _
-
-component :: forall query input output m. MonadStore Store.Action Store.Store m => MonadAff m => H.Component query input output m
+component ::
+  forall query input output m.
+  MonadStore Store.Action Store.Store m =>
+  LoginHandler m =>
+  NavigationHandler m =>
+  MonadAff m =>
+  H.Component query input output m
 component =
   H.mkComponent
     { initialState
@@ -93,6 +90,8 @@ handleAction ::
   forall output m.
   MonadAff m =>
   MonadStore Store.Action Store.Store m =>
+  LoginHandler m =>
+  NavigationHandler m =>
   Action -> H.HalogenM State Action () output m Unit
 handleAction = case _ of
   SetID id -> H.modify_ _ { id = id }
@@ -100,16 +99,5 @@ handleAction = case _ of
   Login ev -> do
     H.liftEffect $ preventDefault ev
     state <- H.get
-    result <- runExceptT $ APIs.login $ APIs.LoginRequestBody { id: state.id, password: state.password }
-    either loginFail loginSuccess result
-  where
-  -- | ログイン失敗時
-  loginFail = case _ of
-    WrongPasswordError -> H.modify_ _ { passState = WrongPassword }
-    err -> do
-      H.liftEffect <<< log <<< show $ err
-      H.modify_ _ { passState = InternalError }
-
-  -- | ログイン成功時
-  loginSuccess _ = do
-    H.liftEffect <<< setHash <<< Routes.pageToHash $ Routes.HomePage --ページ遷移
+    login { id: state.id, password: state.password }
+    navigate HomePage

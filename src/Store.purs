@@ -2,17 +2,13 @@
 グローバルなStateを管理
 主にユーザー情報(ログインしているか、していないかなど)と
 -}
-module Src.Store where
+module Kuragate.Store where
 
 import Data.Maybe (Maybe(..))
-import Halogen.Store.Select (Selector, selectEq)
-import Src.Profile (Profile)
+import Kuragate.Data.Profile (Profile)
 
 type Store
   = { userProfile :: Maybe Profile }
-
-selectUserProfile :: Selector Store (Maybe Profile)
-selectUserProfile = selectEq \store -> store.userProfile
 
 initialStore :: Store
 initialStore = { userProfile: Nothing }

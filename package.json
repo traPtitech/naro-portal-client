@@ -4,9 +4,9 @@
   "description": "Webエンジニアになろう講習会課題のポータルリポジトリ(Client) ## languages purescriptを考えてる。",
   "main": "index.js",
   "scripts": {
-    "test": "spago test",
+    "test": "npx spago test",
     "start": "powershell.exe /c start $(wslpath -w index.html)",
-    "bundle": "spago bundle-app --to index.js"
+    "bundle": "npx spago bundle-app --to index.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,10 @@
   "homepage": "https://github.com/yukikurage/naro-portal-client#readme",
   "dependencies": {
     "spago": "^0.20.3",
-    "purty": "^7.0.0",
     "xhr2": "^0.2.1"
+  },
+  "devDependencies": {
+    "purescript": "^0.14.3",
+    "purty": "^7.0.0"
   }
 }

@@ -1,31 +1,22 @@
-module Src.Components.Signup where
+module Kuragate.Components.Register where
 
 import Prelude
-import Affjax as AX
-import Affjax.RequestBody as RequestBody
-import Affjax.ResponseFormat as ResponseFormat
-import Affjax.StatusCode (StatusCode(..))
-import Control.Monad.Error.Class (throwError)
-import Data.Argonaut.Core (fromString, toBoolean)
-import Data.Either (Either(..), either)
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
 import Effect.Aff.Class (class MonadAff)
-import Effect.Console (log)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Routing.Hash (setHash)
-import Src.Wrapper.Exception (ExceptT, error, except, runExceptT)
-import Src.Wrapper.Generic (recordToJson)
+import Kuragate.Classes.NavigationHandler (class NavigationHandler, navigate)
+import Kuragate.Classes.RegistrationHandler (class RegistrationHandler, isValidID, register)
+import Kuragate.Data.Page (Page(..))
 import Type.Proxy (Proxy(..))
 import Web.Event.Event (Event, preventDefault)
 
 type Slot id
   = forall q. H.Slot q Void id
 
-_signup = Proxy :: Proxy "signup"
+_register = Proxy :: Proxy "register"
 
 type State
   = { id :: String
@@ -38,15 +29,19 @@ data Action
   = SetID String
   | SetName String
   | SetPassWord String
-  | Signup Event
+  | Register Event
   | CheckValidID
 
-newtype SignupRequestBody
-  = SignupRequestBody { id :: String, name :: String, password :: String }
+newtype RegisterRequestBody
+  = RegisterRequestBody { id :: String, name :: String, password :: String }
 
-derive instance genericSignupRequestBody :: Generic SignupRequestBody _
+derive instance genericRegisterRequestBody :: Generic RegisterRequestBody _
 
-component :: forall query input output m. MonadAff m => H.Component query input output m
+component ::
+  forall query input output m.
+  MonadAff m =>
+  RegistrationHandler m =>
+  NavigationHandler m => H.Component query input output m
 component =
   H.mkComponent
     { initialState
@@ -60,7 +55,7 @@ initialState _ = { id: "", name: "", password: "", validID: false }
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
   HH.div_
-    [ HH.form [ HP.class_ $ H.ClassName "form", HE.onSubmit \ev -> Signup ev ]
+    [ HH.form [ HP.class_ $ H.ClassName "form", HE.onSubmit \ev -> Register ev ]
         $ [ HH.ul_
               [ HH.li_ [ HH.text "IDとPasswordは半角英数のみ有効です。" ]
               , HH.li_ [ HH.text "括弧で指定された文字数以内で入力してください。" ]
@@ -94,34 +89,42 @@ render state =
                       , HP.required true
                       ]
                   ]
-              , HH.li_ [ HH.button [ HP.type_ HP.ButtonSubmit, HP.disabled $ not state.validID, HP.id "submit_button" ] [ HH.text "Signup" ] ]
+              , HH.li_ [ HH.button [ HP.type_ HP.ButtonSubmit, HP.disabled $ not state.validID, HP.id "submit_button" ] [ HH.text "Register" ] ]
               , HH.li_ [ HH.text if state.validID then "" else "ユーザー名が重複しているか、空です。" ]
               ]
           ]
     , HH.div_ [ HH.a [ HP.href "#login", HP.class_ $ H.ClassName "small" ] [ HH.text "ログイン画面へ" ] ]
     ]
 
-handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
+handleAction ::
+  forall output m.
+  MonadAff m =>
+  RegistrationHandler m =>
+  NavigationHandler m =>
+  Action -> H.HalogenM State Action () output m Unit
 handleAction = case _ of
   SetID id -> H.modify_ _ { id = id }
   SetPassWord password -> H.modify_ _ { password = password }
   SetName name -> H.modify_ _ { name = name }
-  Signup ev -> do
+  Register ev -> do
     H.liftEffect $ preventDefault ev
     state <- H.get
-    result <- runExceptT <<< signUpAPI $ SignupRequestBody { id: state.id, name: state.name, password: state.password }
-    either (H.liftEffect <<< log <<< show) (\_ -> H.liftEffect $ setHash "#login") result
+    register { id: state.id, name: state.name, password: state.password }
+    navigate LoginPage
   CheckValidID -> do
     state <- H.get
-    checkValid "api/isvalidid" state.id $ \x -> H.modify_ _ { validID = x }
+    res <- isValidID state.id
+    H.modify_ _ { validID = res }
 
-signUpAPI :: forall m. MonadAff m => SignupRequestBody -> ExceptT m Unit
+{-
+signUpAPI :: forall m. MonadAff m => RegisterRequestBody -> ExceptT m Unit
 signUpAPI req = do
   reqJson <- recordToJson req
   result <- H.liftAff <<< AX.post ResponseFormat.ignore "api/signup" <<< Just <<< RequestBody.json $ reqJson
   response <- except result
   when (response.status /= StatusCode 200) $ throwError <<< error $ response.statusText
-
+^}
+{-
 checkValid ::
   forall output m.
   MonadAff m =>
@@ -141,3 +144,4 @@ checkValid reqURL str target = do
     Right res -> case toBoolean res.body of
       Nothing -> target false
       Just x -> target x
+-}

@@ -2,6 +2,36 @@
 
 Web エンジニアになろう講習会課題のポータルリポジトリ(Client)
 
+## 仕組み
+
+URLが異なる⇔違うコンポーネント
+パーツごとにレンダラーを作って行って，コンポーネントごとに配置してくいい感じ
+Kuragate.Componentsと
+Kuragate.Components.Partsに分ける
+
+モナドを使う
+・NavigationHandler
+    navigate
+・LoginHandler
+    login
+    logout
+    getUserProgile
+・RegistrationHandler
+    register
+    unregister
+・MessagesHandler
+    getTimeline
+    getMessages
+    postMessage
+    deleteMessage
+    favMessage
+    unfavMessage
+・EmotesHandler
+    emoteMessage
+    unemoteMessage
+・FollowingHandler
+    follow
+    unfollow
 ## Router の処理のメモ
 
 ~~少し複雑で、自分でも分からなくなりそうなので書く
