@@ -3,6 +3,8 @@ module Kuragate.Components.Register where
 import Prelude
 import Data.Generic.Rep (class Generic)
 import Effect.Aff.Class (class MonadAff)
+import Effect.Class.Console (log)
+import Effect.Console (logShow)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -10,6 +12,8 @@ import Halogen.HTML.Properties as HP
 import Kuragate.Classes.NavigationHandler (class NavigationHandler, navigate)
 import Kuragate.Classes.RegistrationHandler (class RegistrationHandler, isValidID, register)
 import Kuragate.Data.Page (Page(..))
+import Kuragate.Data.Requests (RegisterReq(..))
+import Kuragate.Data.ValidID (ValidID(..))
 import Type.Proxy (Proxy(..))
 import Web.Event.Event (Event, preventDefault)
 
@@ -109,11 +113,12 @@ handleAction = case _ of
   Register ev -> do
     H.liftEffect $ preventDefault ev
     state <- H.get
-    register { id: state.id, name: state.name, password: state.password }
+    H.liftEffect $ logShow $ { id: state.id, name: state.name, password: state.password }
+    register $ RegisterReq { id: state.id, name: state.name, password: state.password }
     navigate LoginPage
   CheckValidID -> do
     state <- H.get
-    res <- isValidID state.id
+    (ValidID res) <- isValidID state.id
     H.modify_ _ { validID = res }
 
 {-

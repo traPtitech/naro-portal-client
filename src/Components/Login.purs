@@ -7,9 +7,10 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.Store.Monad (class MonadStore)
-import Kuragate.Classes.LoginHandler (class LoginHandler, login)
+import Kuragate.Classes.LoginHandler (class LoginHandler, login, updateProfile)
 import Kuragate.Classes.NavigationHandler (class NavigationHandler, navigate)
 import Kuragate.Data.Page (Page(..))
+import Kuragate.Data.Requests (LoginReq(..))
 import Kuragate.Store as Store
 import Type.Proxy (Proxy(..))
 import Web.Event.Event (preventDefault)
@@ -83,7 +84,7 @@ render state =
                   ]
               ]
           ]
-    , HH.div_ [ HH.a [ HP.href "#signup", HP.class_ $ H.ClassName "small" ] [ HH.text "アカウントを作成" ] ]
+    , HH.div_ [ HH.a [ HP.href "#register", HP.class_ $ H.ClassName "small" ] [ HH.text "アカウントを作成" ] ]
     ]
 
 handleAction ::
@@ -99,5 +100,6 @@ handleAction = case _ of
   Login ev -> do
     H.liftEffect $ preventDefault ev
     state <- H.get
-    login { id: state.id, password: state.password }
+    _ <- login $ LoginReq { id: state.id, password: state.password }
+    _ <- updateProfile
     navigate HomePage

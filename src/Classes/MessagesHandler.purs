@@ -2,13 +2,14 @@ module Kuragate.Classes.MessagesHandler where
 
 import Prelude
 
+import Data.Maybe (Maybe)
 import Halogen (HalogenM, lift)
-import Kuragate.Data.Message (Message)
+import Kuragate.Data.Message (Message, Messages)
 
 class
   Monad m <= MessagesHandler m where
-  getMessages :: m (Array Message)
-  getMessage :: Int -> m Message
+  getMessages :: m Messages
+  getMessage :: Int -> m (Maybe Message)
   postMessage :: String -> m Unit
   deleteMessage :: Int -> m Unit
   favMessage :: Int -> m Unit

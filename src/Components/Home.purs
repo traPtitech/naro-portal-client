@@ -5,14 +5,15 @@ import Control.Monad.Error.Class (class MonadThrow, throwError)
 import Data.Array (elem)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff.Class (class MonadAff)
+import Effect.Console (logShow)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.Store.Monad (class MonadStore)
 import Kuragate.Classes.LoginHandler (class LoginHandler, whoami)
-import Kuragate.Classes.MessagesHandler (class MessagesHandler, favMessage, getMessage, getMessages, unfavMessage)
-import Kuragate.Data.Message (Message(..))
+import Kuragate.Classes.MessagesHandler (class MessagesHandler, favMessage, getMessage, getMessages, postMessage, unfavMessage)
+import Kuragate.Data.Message (Message(..), MessageRecord, Messages(..))
 import Kuragate.Data.Profile (Profile(..))
 import Kuragate.Store as Store
 import Type.Proxy (Proxy(..))
@@ -23,7 +24,7 @@ type Slot id
 _home = Proxy :: Proxy "home"
 
 type State
-  = { messages :: Array Message
+  = { messages :: Messages
     , text :: String
     }
 
@@ -31,7 +32,7 @@ data Action
   = UpdateTimeLine
   | Initialize
   | SetText String
-  | Post
+  | Post String
   | Fav Int
 
 type Input
@@ -53,7 +54,7 @@ component =
     }
 
 initialState :: State
-initialState = { messages: [], text: "" }
+initialState = { messages: Messages [], text: "" }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
@@ -63,22 +64,22 @@ render state =
             [ HP.value state.text
             , HE.onValueInput SetText
             ]
-        , HH.button [ HE.onClick (\_ -> Post) ] [ HH.text "Post" ]
+        , HH.button [ HE.onClick (\_ -> Post state.text) ] [ HH.text "Post" ]
         ]
     , HH.div_
-        $ map postBlock state.messages
+        $ map postBlock messages
     ]
+  where
+  (Messages messages) = state.messages
 
-postBlock :: forall w. Message -> HH.HTML w Action
+postBlock :: forall w. MessageRecord -> HH.HTML w Action
 postBlock message = do
-  let
-    Message extracted = message
   HH.div [ HP.class_ $ H.ClassName "post" ]
-    $ [ HH.div_ [ HH.text $ "@" <> extracted.user_id ]
-      , HH.div_ [ HH.text $ extracted.text ]
+    $ [ HH.div_ [ HH.text $ "@" <> message.user_id ]
+      , HH.div_ [ HH.text $ message.text ]
       , HH.div_
-          $ [ HH.button [ HE.onClick \_ -> Fav extracted.id ] [ HH.text "❤" ] ]
-          <> map (\x -> HH.text $ " " <> x <> " ") extracted.fav_users
+          $ [ HH.button [ HE.onClick \_ -> Fav message.id ] [ HH.text "❤" ] ]
+          <> map (\x -> HH.text $ " " <> x <> " ") message.fav_users
       ]
 
 handleAction ::
@@ -93,15 +94,16 @@ handleAction = case _ of
   UpdateTimeLine -> updateMessages
   Initialize -> updateMessages
   SetText text -> H.modify_ _ { text = text }
-  Post -> handlePost
+  Post text -> handlePost text
   Fav id -> handleFav id
 
 handlePost ::
   forall output m.
   MonadAff m =>
   MessagesHandler m =>
-  H.HalogenM State Action () output m Unit
-handlePost = do
+  String -> H.HalogenM State Action () output m Unit
+handlePost text = do
+  postMessage text
   updateMessages
 
 -- | 二回目に押したなら解除
@@ -116,7 +118,8 @@ handleFav ::
 handleFav id = do
   res <- whoami
   Profile prof <- fromMaybe (throwError "ログインしてください") $ map pure $ res
-  (Message message) <- getMessage id
+  resMessages <- getMessage id
+  Message message <- fromMaybe (throwError "ログインしてください") $ map pure $ resMessages
   if prof.id `elem` message.fav_users then
     unfavMessage id
   else
@@ -130,4 +133,5 @@ updateMessages ::
   H.HalogenM State Action () output m Unit
 updateMessages = do
   messages <- getMessages
+  H.liftEffect $ logShow messages
   H.modify_ _ { messages = messages }

@@ -33,6 +33,7 @@ to generate this file without the comments in this block.
   , "prelude"
   , "psci-support"
   , "routing"
+  , "safe-coerce"
   , "transformers"
   , "web-events"
   , "web-html"

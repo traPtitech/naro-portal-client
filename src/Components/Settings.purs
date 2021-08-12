@@ -53,5 +53,5 @@ handleAction ::
   Action -> H.HalogenM State Action () output m Unit
 handleAction = case _ of
   Logout -> do
-    logout
+    _ <- logout
     navigate LoginPage

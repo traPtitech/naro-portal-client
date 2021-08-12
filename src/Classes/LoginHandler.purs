@@ -5,13 +5,14 @@ import Prelude
 import Data.Maybe (Maybe)
 import Halogen (HalogenM, lift)
 import Kuragate.Data.Profile (Profile)
+import Kuragate.Data.Requests (LoginReq)
 
 class
   Monad m <= LoginHandler m where
-  login :: { id :: String, password :: String } -> m Unit
-  logout :: m Unit
+  login :: LoginReq -> m Boolean
+  logout :: m Boolean
   whoami :: m (Maybe Profile)
-  updateProfile :: m Unit
+  updateProfile :: m Boolean
 
 instance LoginHandler m => LoginHandler (HalogenM state action slots output m) where
   login = lift <<< login
