@@ -43,10 +43,9 @@ derive newtype instance Bind AppM
 derive newtype instance Monad AppM
 derive newtype instance MonadEffect AppM
 derive newtype instance MonadAff AppM
-derive newtype instance MonadStore Store.Action Store.Store AppM
 
-runAppM :: forall a s q i o m. Monad m => s -> (s -> a -> s) → H.Component q i o AppM -> Aff (H.Component q i o m)
-runAppM initialStore reduce = runStoreT initialStore reduce <<< coerce
+runApp :: forall a s q i o m. Monad m => s -> (s -> a -> s) → H.Component q i o AppM -> Aff (H.Component q i o m)
+runApp initialStore reduce = runStoreT initialStore reduce <<< coerce
 
 opts :: { fieldTransform :: String -> String
 , sumEncoding :: SumEncoding
