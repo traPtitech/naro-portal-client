@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
-import { useState, VFC } from "react";
+import { VFC } from "react";
 import { css, keyframes } from "@emotion/react";
 import logo from "/logo.svg";
+import Router from "./router/Router";
 
 const keyframe = {
   spin: keyframes`
@@ -37,41 +38,11 @@ const style = {
 };
 
 const App: VFC = () => {
-  const [count, setCount] = useState(0);
-
   return (
     <div css={style.app}>
       <header className="pt-20" css={style.header}>
         <img src={logo} css={style.logo} alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button
-            className="px-2 rounded-md border- button"
-            type="button"
-            onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer">
-            Learn React
-          </a>
-          {" | "}
-          <a
-            className="link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer">
-            Vite Docs
-          </a>
-        </p>
+        <Router />
       </header>
     </div>
   );
