@@ -1,7 +1,7 @@
 FROM node:16.10.0-alpine AS builder
 WORKDIR /build
 
-RUN cp . .
+COPY . .
 RUN npm ci --unsafe-perm
 RUN npm run build
 
