@@ -1,6 +1,5 @@
 FROM node:16.10.0-alpine AS builder
 WORKDIR /build
-RUN apk add git
 
 RUN cp . .
 RUN npm ci --unsafe-perm
