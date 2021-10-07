@@ -1,9 +1,15 @@
 .github
 .git
+.vscode
 
 node_modules
+.eslintrc.json
+.prettierrc.json
+.gitignore
 
 .DS_Store
 /dist
 
-.vscode
+LICENSE
+README.md
+docs
