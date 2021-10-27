@@ -3,11 +3,11 @@ name: dev_build
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   IMAGE_NAME: q-n-a_ui
-  IMAGE_TAG: master
+  IMAGE_TAG: main
   DEPLOY_REPO: dev-deploy
   SIDE: frontend
 
