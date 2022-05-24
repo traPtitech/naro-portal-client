@@ -1,0 +1,59 @@
+<script setup>
+import axios from "axios";
+//import router from "./router.js";
+import { useRouter, useRoute } from "vue-router";
+const router = useRouter();
+const route = useRoute();
+
+const logout = async () => {
+  axios.get("/api/logout").then((resopnse) => {
+    if (resopnse.status === 200) {
+      console.log("logout");
+      if (route.fullPath === "/") location.reload();
+      else router.push("/");
+      console.log("logout2");
+    }
+  });
+};
+</script>
+
+<template>
+  <main>
+    <div :class="$style.container">
+      <header :class="$style.header">
+        <router-link to="/">Home</router-link>
+        |
+        <router-link to="/countries">Countries</router-link>
+        |
+        <router-link to="/login">Login</router-link>
+        |
+        <router-link to="/signup">Signup</router-link>
+        |
+        <a :class="$style.logout" @click="logout">Logout</a>
+        <button @click="logout">Logout</button>
+      </header>
+
+      <router-view />
+    </div>
+  </main>
+</template>
+
+<style module>
+.logout {
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+}
+a:visited {
+  color: purple;
+}
+.container {
+  max-width: fit-content;
+  margin: auto;
+  text-align: center;
+}
+.header {
+  display: flex;
+  justify-content: center;
+}
+</style>
