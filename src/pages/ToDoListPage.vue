@@ -1,7 +1,13 @@
 <script setup>
-import ToDoList from "./ToDoList.vue";
+import ToDoList from "../components/ToDoList.vue";
 </script>
 
 <template>
-  <To-Do-List />
+  <div :class="$style.todolist"><ToDoList /></div>
 </template>
+
+<style module>
+.todolist {
+  padding-top: 3rem;
+}
+</style>

@@ -61,7 +61,6 @@ const completeTask = (name, deadline, id) => {
       traQID: userName,
     }) //isCompleteの値を更新,実はcompleteTaskとuncompleteTaskは統合できる
     .then(() => {
-      console.log("i");
       refreshTasks();
     })
     .catch((err) => {
@@ -165,7 +164,7 @@ onMounted(() => {
   color: red;
 }
 .list {
-  padding: 1rem;
+  margin: 1rem;
 }
 .cTask {
   color: gray;

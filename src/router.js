@@ -8,6 +8,7 @@ import SignupPage from "./pages/SignupPage.vue";
 import CityPage from "./pages/CityPage.vue";
 import CountriesPage from "./pages/CountriesPage.vue";
 import CitiesInCountryPage from "./pages/CitiesInCountryPage.vue";
+import ToDoListPage from "./pages/ToDoListPage.vue";
 
 const routes = [
   { path: "/", name: "home", component: HomePage, meta: { isPublic: true } },
@@ -29,6 +30,12 @@ const routes = [
     path: "/countries",
     name: "countries",
     component: CountriesPage,
+    props: true,
+  },
+  {
+    path: "/toDoList",
+    name: "toDoList",
+    component: ToDoListPage,
     props: true,
   },
   {

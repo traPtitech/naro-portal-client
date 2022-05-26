@@ -8,10 +8,8 @@ const route = useRoute();
 const logout = async () => {
   axios.get("/api/logout").then((resopnse) => {
     if (resopnse.status === 200) {
-      console.log("logout");
       if (route.fullPath === "/") location.reload();
       else router.push("/");
-      console.log("logout2");
     }
   });
 };
@@ -23,6 +21,8 @@ const logout = async () => {
       <header :class="$style.header">
         <router-link to="/">Home</router-link>
         |
+        <router-link to="/toDoList">ToDoList</router-link>
+        |
         <router-link to="/countries">Countries</router-link>
         |
         <router-link to="/login">Login</router-link>
@@ -30,7 +30,6 @@ const logout = async () => {
         <router-link to="/signup">Signup</router-link>
         |
         <a :class="$style.logout" @click="logout">Logout</a>
-        <button @click="logout">Logout</button>
       </header>
 
       <router-view />
@@ -48,7 +47,6 @@ a:visited {
   color: purple;
 }
 .container {
-  max-width: fit-content;
   margin: auto;
   text-align: center;
 }

@@ -1,17 +1,15 @@
 <template>
   <div>
     <h1>{{ msg }}</h1>
-    <ClickCounter />
-    <ToDoList />
+    <Poster />
   </div>
 </template>
 
 <script setup>
-import ClickCounter from "./ClickCounter.vue";
-import ToDoList from "./ToDoList.vue";
+import Poster from "./PosterComp.vue";
 
 defineProps({
-  msg: { type: String, default: "" },
+  msg: { type: String, default: "Hello Twiclone" },
 });
 </script>
 
