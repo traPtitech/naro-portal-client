@@ -34,6 +34,7 @@ const refreshPosts = () => {
 };
 
 const addPost = () => {
+  console.log(newPostBody.value);
   axios
     .post(ServerURL + "/post", {
       body: newPostBody.value,
@@ -77,21 +78,23 @@ onUpdated(() => {
   <div ref="frame" :class="$style.frame">
     <div v-for="post in revercePosts" :key="post.id" ref="postUnits">
       <div :class="$style.posts">
-        <div :class="$style.userName">
-          投稿者:{{ post.userName }} / {{ post.postTime }}
+        <div :class="$style.uNameAndBody">
+          <div :class="$style.userName">
+            投稿者:{{ post.userName }} / {{ post.postTime }}
+          </div>
+          <div :class="$style.post">
+            <div :class="$style.body">
+              <div :class="$style.bodyExp">内容　:</div>
+              <div :class="$style.bodyText">{{ post.body }}</div>
+            </div>
+          </div>
         </div>
-        <div :class="$style.post">
-          <div :class="$style.body">
-            <div :class="$style.bodyExp">内容　:</div>
-            <div :class="$style.bodyText">{{ post.body }}</div>
-          </div>
-          <div :class="$style.likesDiv">
-            <span :class="$style.likesSpan">
-              これすこ:{{ post.likeCount }}人<br />みんな見て!:{{
-                post.repostCount
-              }}人
-            </span>
-          </div>
+        <div :class="$style.likesDiv">
+          <span :class="$style.likesSpan">
+            これすこ:{{ post.likeCount }}人<br />みんな見て!:{{
+              post.repostCount
+            }}人
+          </span>
         </div>
       </div>
     </div>
@@ -99,7 +102,7 @@ onUpdated(() => {
   <div>
     <label>
       内容
-      <input v-model="newPostBody" :class="$style.input" type="text" />
+      <textarea v-model="newPostBody" :class="$style.input" type="text" />
     </label>
     <button @click="addPost">投稿</button>
   </div>
@@ -118,9 +121,12 @@ onUpdated(() => {
   text-align: center;
   margin-bottom: 0.3rem;
   border: solid 3px rgb(17, 119, 119);
+  display: flex;
+  align-items: flex-end;
 }
 .userName {
   text-align: left;
+  overflow-wrap: break-word;
 }
 .postBody {
   /* width: 85%; */
@@ -134,11 +140,12 @@ onUpdated(() => {
   text-align: left;
   margin-right: 0px;
   display: flex;
-  width: calc(100% - 8rem);
+  width: 100%;
 }
 .likesSpan {
   align-items: flex-end;
   width: auto;
+  text-align: left;
 }
 .likesDiv {
   display: flex;
@@ -149,10 +156,15 @@ onUpdated(() => {
 }
 .bodyText {
   overflow-wrap: break-word;
+  white-space: break-spaces;
   width: calc(100% - 3rem);
 }
 .input {
   width: calc(60% - 6rem);
+  height: 3.5rem;
   min-width: 27rem;
+}
+.uNameAndBody {
+  width: calc(100% - 10rem);
 }
 </style>
