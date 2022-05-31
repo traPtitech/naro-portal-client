@@ -2,6 +2,24 @@
 import { nextTick, ref, onMounted, onUpdated } from "vue";
 import axios from "axios";
 import { computed } from "@vue/reactivity";
+//import MarkdownItVue from "markdown-it-vue";
+import "markdown-it-vue/dist/markdown-it-vue.css";
+import VueMarkdownIt from "vue3-markdown-it";
+import "highlight.js/styles/monokai.css";
+import markdownItLatex from "markdown-it-latex";
+import markdownItContainer from "markdown-it-container";
+import markdownItKatex from "markdown-it-katex";
+//import markdownItImsize from "markdown-it-imsize";
+//import MarkdownItSup from "markdown-it-sup";
+//import MdEditor from "md-editor-v3";
+import MarkdownItStrikethroughAlt from "markdown-it-strikethrough-alt";
+import "md-editor-v3/lib/style.css";
+
+// let tm = require("markdown-it-texmath");
+// let md = require("markdown-it")().use(tm, {
+//   engine: require("katex"),
+//   delimiters: "dollars",
+// });
 
 const newPostBody = ref("");
 const posts = ref([]);
@@ -9,6 +27,21 @@ const ServerURL = "/api/";
 const frame = ref(null);
 const postUnits = ref(null);
 let isScroll;
+//const content = "# your markdown content";
+const plugins = [
+  {
+    plugin: markdownItLatex,
+  },
+  {
+    plugin: markdownItKatex,
+  },
+  {
+    plugin: markdownItContainer,
+  },
+  {
+    plugin: MarkdownItStrikethroughAlt,
+  },
+];
 // "https://temma.trap.show/naro-todo-server/"
 // "http://133.130.109.224:10101/"
 // let userName = "userName";
@@ -85,7 +118,14 @@ onUpdated(() => {
           <div :class="$style.post">
             <div :class="$style.body">
               <div :class="$style.bodyExp">内容　:</div>
-              <div :class="$style.bodyText">{{ post.body }}</div>
+              <!-- <div :class="$style.bodyText">{{ post.body }}</div> -->
+              <VueMarkdownIt
+                :breaks="true"
+                :class="$style.bodyText"
+                :html="true"
+                :plugins="plugins"
+                :source="post.body"
+              />
             </div>
           </div>
         </div>
@@ -105,12 +145,21 @@ onUpdated(() => {
       <textarea v-model="newPostBody" :class="$style.input" type="text" />
     </label>
     <button @click="addPost">投稿</button>
+    <!-- <MarkdownItVue class="md-body" :content="content" /> -->
+    <!-- <VueMarkdownIt class="md-body" :source="content" /> -->
   </div>
+  <!-- <div v-html="md.render(content)"></div> -->
 </template>
 
 <style module>
+* {
+  margin-block-start: 0rem;
+  margin-block-end: 0rem;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
 .frame {
-  max-height: 70vh;
+  max-height: calc(95vh - 6.5rem);
   width: 60%;
   min-width: 30rem;
   margin-left: auto;
@@ -156,13 +205,13 @@ onUpdated(() => {
 }
 .bodyText {
   overflow-wrap: break-word;
-  white-space: break-spaces;
   width: calc(100% - 3rem);
+  margin-bottom: auto;
 }
 .input {
   width: calc(60% - 6rem);
   height: 3.5rem;
-  min-width: 27rem;
+  min-width: 26rem;
 }
 .uNameAndBody {
   width: calc(100% - 10rem);

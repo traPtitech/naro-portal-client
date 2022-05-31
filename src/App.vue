@@ -53,5 +53,6 @@ a:visited {
 .header {
   display: flex;
   justify-content: center;
+  height: 3rem;
 }
 </style>
