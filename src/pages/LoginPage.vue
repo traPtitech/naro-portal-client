@@ -13,13 +13,17 @@ const login = () =>
 
 <template>
   <div class="login">
-    <h1>This is an login page</h1>
+    <h1>ログイン</h1>
     <div>
+      名前　　　
       <input v-model="username" type="text" />
+      <br />
+      パスワード
       <input v-model="password" type="password" />
     </div>
     <div>
       <button @click="login">login</button>
     </div>
+    <router-link to="/test">または、アカウントを作る</router-link>
   </div>
 </template>

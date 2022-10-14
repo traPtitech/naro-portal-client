@@ -39,6 +39,6 @@ onMounted(async () => {
         {{ twitterInfo[n]["naiyou"]["String"] }}<br
       /></span>
     </div>
-    <div v-else>街が見つかりませんでした</div>
+    <div v-else></div>
   </div>
 </template>
